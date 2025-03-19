@@ -1,0 +1,12 @@
+{
+  "name": "vue-tailwind-starter",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development && vite --mode development",
+    "test": "cross-env NODE_ENV=test && vite --mode test",
+    "build": "cross-env NODE_ENV=production && vue-tsc -b && vite build --mode production",
+    "preview": "vite preview"
+  }
+}

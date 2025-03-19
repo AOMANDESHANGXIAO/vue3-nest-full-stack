@@ -1,0 +1,12 @@
+{
+  "name": "@v3-nest-full-stack/shared",
+  "version": "1.0.0",
+  "description": "这个包用来放置前后端公用的一些东西，包括返回类型，枚举类型，工具类，接口定义等等",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

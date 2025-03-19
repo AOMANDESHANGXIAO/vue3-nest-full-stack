@@ -1,0 +1,16 @@
+/* This is used to set the theme for the app. */
+html {
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+html.dark {
+  --color-text: white;
+  --color-bg: #1d1d1d;
+}
+html.light {
+  --color-text: #1e2939;
+  --color-bg: #f8fafc;
+}
+.dark::view-transition-old(root) {
+  z-index: 100;
+}
