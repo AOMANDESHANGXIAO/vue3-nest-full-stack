@@ -1,7 +1,7 @@
 /**
  * 接口返回类型定义
  */
-export type Response<T> = {
+export type ApiResponse<T> = {
   code: number
   message: string
   success: boolean
