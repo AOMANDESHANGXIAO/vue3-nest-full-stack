@@ -8,6 +8,7 @@
     "front:dev": "pnpm -C packages/front-end dev",
     "front:test": "pnpm -C packages/front-end test",
     "front:build": "pnpm -C packages/front-end build",
+    "back:dev": "pnpm -C packages/back-end start:dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
