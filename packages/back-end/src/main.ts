@@ -8,6 +8,7 @@ import { Reflector } from '@nestjs/core';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new AllExceptionFilter());
   app.useGlobalGuards(new AuthGuard(new JwtService(), new Reflector()));
