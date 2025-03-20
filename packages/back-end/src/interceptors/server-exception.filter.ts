@@ -12,16 +12,13 @@ import { ApiResponse } from '@v3-nest-full-stack/shared';
 @Catch()
 export class ServerExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
-    console.log('server-exception:', exception);
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-
-    // 检查异常是否为HttpException
     if (exception instanceof HttpException) {
-      // 如果是HttpException，则不进行处理，让框架默认处理
       return;
     }
-    // 处理非HttpException的异常
+    // 开发模式下，打印错误栈
+    console.log('dev:server-exception:', exception);
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
     const status = HttpStatus.INTERNAL_SERVER_ERROR;
     const message = 'Internal server error';
     const res: ApiResponse<any> = {
