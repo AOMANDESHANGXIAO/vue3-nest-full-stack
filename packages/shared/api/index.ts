@@ -5,6 +5,6 @@ export type Response<T> = {
   code: number
   message: string
   success: boolean
-  timestamp: number
+  timestamp: string
   data: T
 }
