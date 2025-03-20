@@ -1,15 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  UseGuards,
-} from '@nestjs/common';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Public } from 'src/guards/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -20,13 +12,14 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     // return this.usersService.findAll();
-    throw new Error('Forbidden');
+    // throw new Error('Forbidden');
+    return 'hello world';
   }
 
-  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);

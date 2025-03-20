@@ -3,7 +3,6 @@ import {
   Catch,
   ArgumentsHost,
   HttpException,
-  UnauthorizedException,
   HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -12,7 +11,7 @@ import type { ApiResponse } from '@v3-nest-full-stack/shared';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
-  catch(exception: unknown | UnauthorizedException, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const isHttpException = exception instanceof HttpException;
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
