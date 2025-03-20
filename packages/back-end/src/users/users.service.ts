@@ -16,7 +16,8 @@ export class UsersService {
   }
 
   findAll() {
-    return `This action returns all users`;
+    throw new Error('Method not implemented.');
+    // return `This action returns all users`;
   }
 
   findOne(id: number) {
