@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpStatus } from '@nestjs/common';
 import * as moment from 'moment';
-import { type ApiResponse } from '@v3-nest-full-stack/shared';
+import { type ApiResponse } from '@v3-nest-full-stack/shared-types';
 
 @Injectable()
 export class TransformInterceptor<T>

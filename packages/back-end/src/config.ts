@@ -1,5 +1,5 @@
-import { RoleEnum } from '@v3-nest-full-stack/shared';
-import { PermissionEnum } from '@v3-nest-full-stack/shared';
+import { RoleEnum } from '@v3-nest-full-stack/shared-types';
+import { PermissionEnum } from '@v3-nest-full-stack/shared-types';
 
 const roles: RoleEnum[] = [RoleEnum.Admin, RoleEnum.SuperAdmin, RoleEnum.User];
 const permissions: { name: PermissionEnum; dec: string }[] = [

@@ -1,27 +1,30 @@
 import { IsString, MinLength, MaxLength, Matches } from 'class-validator';
+import { AuthUserConstant } from 'src/constants';
+// import { AuthUserConstant } from '@v3-nest-full-stack/shared';
 
+const { username, password, nickname } = AuthUserConstant;
 export class CreateUserDto {
-  @MinLength(3)
-  @MaxLength(20)
+  @MinLength(username.minLength)
+  @MaxLength(username.maxLength)
   @IsString()
-  @Matches(/^[a-zA-Z0-9_]+$/, {
-    message: '用户名只能包含字母、数字和下划线',
+  @Matches(username.regex, {
+    message: username.message,
   })
   username: string;
 
-  @MinLength(6)
-  @MaxLength(15)
+  @MinLength(password.minLength)
+  @MaxLength(password.maxLength)
   @IsString()
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,15}$/, {
-    message: '密码必须包含至少一个大写字母、一个小写字母和一个数字',
+  @Matches(password.regex, {
+    message: password.message,
   })
   password: string;
 
-  @MinLength(2)
-  @MaxLength(20)
+  @MinLength(nickname.minLength)
+  @MaxLength(nickname.maxLength)
   @IsString()
-  @Matches(/^[\u4e00-\u9fa5a-zA-Z0-9_\-\s·]+$/, {
-    message: '昵称只能包含中文、字母、数字、下划线、横线、空格和点',
+  @Matches(nickname.regex, {
+    message: nickname.message,
   })
   nickname: string;
 }

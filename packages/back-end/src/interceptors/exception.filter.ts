@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import * as moment from 'moment';
-import type { ApiResponse } from '@v3-nest-full-stack/shared';
+import type { ApiResponse } from '@v3-nest-full-stack/shared-types';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {

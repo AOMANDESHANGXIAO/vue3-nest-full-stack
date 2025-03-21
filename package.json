@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@v3-nest-full-stack/shared": "workspace:*",
     "@ant-design/icons-vue": "^7.0.1",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
@@ -42,7 +43,7 @@
     "@iconify-json/mdi": "^1.2.3",
     "@types/node": "^22.13.9",
     "@unocss/preset-icons": "66.1.0-beta.3",
-    "@v3-nest-full-stack/shared": "workspace:*",
+    "@v3-nest-full-stack/shared-types": "workspace:*",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
     "mockjs": "^1.1.0",
