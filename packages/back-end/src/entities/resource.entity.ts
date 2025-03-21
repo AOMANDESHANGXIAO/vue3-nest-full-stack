@@ -7,14 +7,19 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Permission {
+export class Resource {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({
     length: 50,
   })
-  name: string;
+  method: string; // 请求方法
+
+  @Column({
+    length: 50,
+  })
+  path: string; // 后端的路由API地址
 
   // 描述
   @Column({

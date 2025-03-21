@@ -4,9 +4,9 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
-import { PermissionsModule } from './permissions/permissions.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
+import { ResourceModule } from './resources/resource.module';
 
 @Module({
   imports: [
@@ -18,8 +18,9 @@ import { JwtService } from '@nestjs/jwt';
     }),
     UsersModule,
     RolesModule,
-    PermissionsModule,
+    ResourceModule,
     AuthModule,
+    ResourceModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],

@@ -7,12 +7,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Permission } from './permission.entity';
+import { Resource } from './resource.entity';
 
 @Entity()
 export class Role {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({
     length: 20,
@@ -25,9 +25,9 @@ export class Role {
   @UpdateDateColumn()
   updateTime: Date;
 
-  @ManyToMany(() => Permission)
+  @ManyToMany(() => Resource)
   @JoinTable({
-    name: 'role_permission_relation',
+    name: 'role_resource_relation',
   })
-  permissions: Permission[];
+  resources: Resource[];
 }
