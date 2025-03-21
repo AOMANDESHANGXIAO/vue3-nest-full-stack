@@ -12,7 +12,6 @@ export class ResourceService {
   ) {}
   // 获取所有的后端api地址
   getAllApis(@Request() req: ExpressRequest) {
-    console.log('req', req);
     const router = req.app._router as Router;
     return {
       routes: router.stack

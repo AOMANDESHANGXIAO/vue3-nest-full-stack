@@ -7,6 +7,8 @@ import { RolesModule } from './roles/roles.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
 import { ResourceModule } from './resources/resource.module';
+import { PermissionModule } from './permission/permission.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { ResourceModule } from './resources/resource.module';
     ResourceModule,
     AuthModule,
     ResourceModule,
+    PermissionModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],

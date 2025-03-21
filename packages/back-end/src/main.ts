@@ -6,6 +6,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { config } from './config';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix(config.globalPrefix);
