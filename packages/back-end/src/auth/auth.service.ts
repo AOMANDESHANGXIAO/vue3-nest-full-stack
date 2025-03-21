@@ -78,7 +78,7 @@ export class AuthService {
 
     // 生成JWT token
     const payload = {
-      sub: user.id,
+      uuid: user.id,
       roles: user.roles.map((role) => role.name), // 提取角色名称
     };
     const accessToken = this.jwtService.sign(payload);
