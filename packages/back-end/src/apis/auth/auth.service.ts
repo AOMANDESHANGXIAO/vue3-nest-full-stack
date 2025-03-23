@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login-dto';
-import { User } from '../entities/user.entity';
+import { User } from 'src/entities/user.entity';
 import { Role } from 'src/entities/role.entity';
 import { RoleEnum } from '@v3-nest-full-stack/shared-types';
 import * as bcrypt from 'bcrypt';
