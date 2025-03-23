@@ -1,7 +1,43 @@
 import { RoleEnum } from '@v3-nest-full-stack/shared-types';
 import { PermissionEnum } from '@v3-nest-full-stack/shared-types';
+export type RoleTypeItem = {
+  name: RoleEnum;
+  permissions: PermissionEnum[];
+};
 
-const roles: RoleEnum[] = [RoleEnum.Admin, RoleEnum.SuperAdmin, RoleEnum.User];
+const roles: RoleTypeItem[] = [
+  {
+    name: RoleEnum.User,
+    permissions: [PermissionEnum.UserBusiness],
+  },
+  {
+    name: RoleEnum.Admin,
+    permissions: [
+      PermissionEnum.UserBusiness,
+      PermissionEnum.ManageAdd,
+      PermissionEnum.ManageUpdate,
+      PermissionEnum.ManageQuery,
+      PermissionEnum.ManageImport,
+      PermissionEnum.ManageExport,
+    ],
+  },
+  {
+    name: RoleEnum.SuperAdmin,
+    permissions: [
+      PermissionEnum.UserBusiness,
+      PermissionEnum.ManageQuery,
+      PermissionEnum.ManageAdd,
+      PermissionEnum.ManageUpdate,
+      PermissionEnum.ManageDelete,
+      PermissionEnum.ManageImport,
+      PermissionEnum.ManageExport,
+      PermissionEnum.AdminAdd,
+      PermissionEnum.AdminDelete,
+      PermissionEnum.AdminUpdate,
+      PermissionEnum.AdminQuery,
+    ],
+  },
+];
 const permissions: { name: PermissionEnum; dec: string }[] = [
   {
     name: PermissionEnum.UserBusiness,

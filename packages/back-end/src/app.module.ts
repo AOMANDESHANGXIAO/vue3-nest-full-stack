@@ -9,8 +9,13 @@ import { JwtService } from '@nestjs/jwt';
 import { ResourceModule } from './resources/resource.module';
 import { PermissionModule } from './permission/permission.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { APP_GUARD } from '@nestjs/core';
+import { LoginGuard } from './guards/login.guard';
 
 @Module({
+  /**
+   * RoleModule必须在PermissionModule之前加载，因为PermissionModule需要RoleModule先加载Role
+   */
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
@@ -27,6 +32,10 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
-  providers: [AppService, JwtService],
+  providers: [
+    AppService,
+    JwtService,
+    { provide: APP_GUARD, useClass: LoginGuard },
+  ],
 })
 export class AppModule {}

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Public } from 'src/guards/auth.guard';
+import { Public } from 'src/decorators/custom-decorator';
 
 @Controller('users')
 export class UsersController {

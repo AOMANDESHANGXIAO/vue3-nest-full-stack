@@ -2,7 +2,7 @@ import { Controller, Get, Post, Request } from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
 import { Reflector } from '@nestjs/core';
 import { ResourceService } from './resource.service';
-import { Public } from 'src/guards/auth.guard';
+import { Public } from 'src/decorators/custom-decorator';
 
 @Controller('resource')
 export class ResourceController {

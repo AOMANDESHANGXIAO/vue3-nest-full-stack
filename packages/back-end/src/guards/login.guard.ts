@@ -3,40 +3,25 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-  SetMetadata,
+  Scope,
+  Inject,
 } from '@nestjs/common';
-import type { Reflector } from '@nestjs/core';
+import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants, IS_PUBLIC_KEY } from '../constants';
 import { Request } from 'express';
-import { config } from 'src/config';
 import { JWTPayload } from 'src/types';
-export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
-export const getRequestPath = (context: ExecutionContext) => {
-  // 获取请求的元信息
-  // ...
-  const request = context.switchToHttp().getRequest();
-  const method = request.method;
-  console.log('method', method);
+declare module 'express' {
+  interface Request {
+    user: JWTPayload;
+  }
+}
 
-  // 获取匹配的路由信息
-  const handler = context.getHandler(); // 获取路由处理函数
-  const controller = context.getClass(); // 获取控制器类
-  const routePath = Reflect.getMetadata('path', handler); // 获取路由路径
-  const controllerPath = Reflect.getMetadata('path', controller); // 获取控制器路径
-  // 这样能获取到匹配的路由路径，可以请求数据库，并进行身份的验证...
-  const fullRoutePath = `${config.globalPrefix}/${controllerPath}/${routePath}`; // 完整路由路径
-  // 控制器路径/路由路径
-  return fullRoutePath;
-};
-
-@Injectable()
-export class AuthGuard implements CanActivate {
-  constructor(
-    private jwtService: JwtService,
-    private reflector: Reflector,
-  ) {}
+@Injectable({ scope: Scope.DEFAULT })
+export class LoginGuard implements CanActivate {
+  @Inject(JwtService) private jwtService: JwtService;
+  @Inject(Reflector) private reflector: Reflector;
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -60,8 +45,7 @@ export class AuthGuard implements CanActivate {
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       request['user'] = payload;
-      console.log('payload', payload);
-    } catch {
+    } catch (e) {
       throw new UnauthorizedException();
     }
     return true;

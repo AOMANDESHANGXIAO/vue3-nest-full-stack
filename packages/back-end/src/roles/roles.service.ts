@@ -12,13 +12,20 @@ export class RolesService implements OnModuleInit {
 
   async onModuleInit() {
     console.log('RolesService OnModuleInit');
-    await this.initialize();
+    // await this.initialize();
+    await this.reset();
   }
 
   async initialize() {
     if (await this.roleRepository.count()) return;
-    const initRoles = config.roles.map((item) => ({ name: item }));
+    const initRoles = config.roles.map((item) => ({ name: item.name }));
     await this.roleRepository.save(initRoles);
+    return true;
+  }
+
+  async reset() {
+    await this.roleRepository.delete({});
+    await this.initialize();
     return true;
   }
 }

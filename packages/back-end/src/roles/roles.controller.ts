@@ -1,6 +1,6 @@
 import { Controller, Post } from '@nestjs/common';
 import { RolesService } from './roles.service';
-import { Public } from 'src/guards/auth.guard';
+import { Public } from 'src/decorators/custom-decorator';
 
 @Controller('roles')
 export class RolesController {

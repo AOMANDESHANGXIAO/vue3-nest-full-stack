@@ -88,4 +88,23 @@ export class AuthService {
       access_token: accessToken,
     };
   }
+
+  async getUserPermissions(uuid: string) {
+    // 根据用户ID查询用户信息，包括关联的角色
+    const user = await this.userRepository.findOne({
+      where: { id: uuid },
+      relations: ['roles', 'roles.permissions'],
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('用户不存在');
+    }
+    // 获取权限
+    const permissions = user.roles.reduce((acc, role) => {
+      return acc.concat(role.permissions);
+    }, []);
+
+    // 返回权限列表
+    return permissions;
+  }
 }
