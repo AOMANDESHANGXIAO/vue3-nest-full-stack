@@ -85,8 +85,6 @@ const permissions: { name: PermissionEnum; dec: string }[] = [
   },
 ];
 export const config = {
-  // 全局前缀
-  globalPrefix: '/api',
   // 角色设置
   roles,
   // 权限设置

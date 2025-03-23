@@ -5,14 +5,15 @@ import { User } from 'src/entities/user.entity';
 import { Role } from 'src/entities/role.entity';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { jwtConstants } from 'src/constants';
+import configuration from 'src/config/configuration';
 
+const config = configuration();
 @Module({
   imports: [
     JwtModule.register({
       global: true,
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '30d' },
+      secret: config.jwt.secret,
+      signOptions: { expiresIn: config.jwt.expiresIn },
     }),
     TypeOrmModule.forFeature([User, Role]),
   ],

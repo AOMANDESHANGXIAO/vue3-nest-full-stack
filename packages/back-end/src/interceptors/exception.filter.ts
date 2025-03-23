@@ -16,16 +16,20 @@ export class AllExceptionFilter implements ExceptionFilter {
     const isHttpException = exception instanceof HttpException;
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const status = isHttpException
+    const code = isHttpException
       ? exception.getStatus()
       : HttpStatus.INTERNAL_SERVER_ERROR;
+    const message = (exception as HttpException).message
+      ? (exception as HttpException).message
+      : 'Internal server error';
+    const timestamp = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
     const res: ApiResponse<any> = {
-      code: status,
-      message: isHttpException ? exception.message : 'Internal server error',
+      code,
+      message,
       success: false,
-      timestamp: moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
+      timestamp,
       data: null,
     };
-    response.status(status).json(res);
+    response.status(code).json(res);
   }
 }

@@ -1,6 +1,3 @@
-export const jwtConstants = {
-  secret: 'secretKey',
-};
 export const AuthUserConstant = {
   username: {
     minLength: 3,
@@ -21,6 +18,5 @@ export const AuthUserConstant = {
     message: '昵称只能包含中文、字母、数字、下划线、横线、空格和点',
   },
 };
-export const IS_PUBLIC_KEY = 'isPublic';
 export const REQUIRE_LOGIN_KEY = 'requireLogin';
 export const REQUIRE_PERMISSIONS_KEY = 'requirePermissions';
