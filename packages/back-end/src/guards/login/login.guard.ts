@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { jwtConstants, IS_PUBLIC_KEY } from '../constants';
+import { jwtConstants, REQUIRE_LOGIN_KEY } from 'src/constants';
 import { Request } from 'express';
 import { JWTPayload } from 'src/types';
 
@@ -24,17 +24,18 @@ export class LoginGuard implements CanActivate {
   @Inject(Reflector) private reflector: Reflector;
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    console.log('login-guard check');
     const request = context.switchToHttp().getRequest();
 
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (isPublic) {
-      // 💡 See this condition
+    const isRequiredLogin = this.reflector.getAllAndOverride<boolean>(
+      REQUIRE_LOGIN_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+    if (!isRequiredLogin) {
       return true;
     }
     const token = this.extractTokenFromHeader(request);
+    console.log('login-guard token', token);
     if (!token) {
       throw new UnauthorizedException();
     }
@@ -46,6 +47,7 @@ export class LoginGuard implements CanActivate {
       // so that we can access it in our route handlers
       request['user'] = payload;
     } catch (e) {
+      console.log('login-guard error', e);
       throw new UnauthorizedException();
     }
     return true;

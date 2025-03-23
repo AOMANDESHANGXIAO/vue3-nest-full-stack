@@ -12,6 +12,7 @@ import { User } from '../entities/user.entity';
 import { Role } from 'src/entities/role.entity';
 import { RoleEnum } from '@v3-nest-full-stack/shared-types';
 import * as bcrypt from 'bcrypt';
+import * as _ from 'lodash';
 
 @Injectable()
 export class AuthService {
@@ -41,6 +42,7 @@ export class AuthService {
     const role = await this.roleRepository.findOne({
       where: { name: RoleEnum.User },
     });
+    console.log('role', role);
     // 创建新用户
     const newUser = this.userRepository.create({
       username: createUserDto.username,
@@ -50,11 +52,10 @@ export class AuthService {
     });
 
     // 保存用户到数据库
-    await this.userRepository.save(newUser);
-
+    const result = await this.userRepository.save(newUser);
     // 设置角色, 这里注册的用户是普通用户 RoleEnum.User
     // 注册成功
-    return {};
+    return _.omit(result, ['password']);
   }
 
   async login(loginDto: LoginDto) {

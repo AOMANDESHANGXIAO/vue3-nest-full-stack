@@ -18,8 +18,8 @@ export class PermissionService implements OnModuleInit {
 
   async onModuleInit() {
     console.log('PermissionService OnModuleInit');
-    // await this.initialize();
-    await this.reset();
+    await this.initialize();
+    // await this.reset();
   }
 
   async initialize() {
@@ -36,6 +36,7 @@ export class PermissionService implements OnModuleInit {
       });
       role.permissions = permissions;
     }
+
     await this.roleRepository.save(roles);
     return true;
   }

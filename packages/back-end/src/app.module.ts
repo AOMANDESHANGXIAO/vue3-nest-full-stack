@@ -10,8 +10,8 @@ import { ResourceModule } from './resources/resource.module';
 import { PermissionModule } from './permission/permission.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_GUARD } from '@nestjs/core';
-import { LoginGuard } from './guards/login.guard';
-
+import { LoginGuard } from 'src/guards/login/login.guard';
+import { PermissionGuard } from 'src/guards/permission/permission.guard';
 @Module({
   /**
    * RoleModule必须在PermissionModule之前加载，因为PermissionModule需要RoleModule先加载Role
@@ -36,6 +36,7 @@ import { LoginGuard } from './guards/login.guard';
     AppService,
     JwtService,
     { provide: APP_GUARD, useClass: LoginGuard },
+    { provide: APP_GUARD, useClass: PermissionGuard },
   ],
 })
 export class AppModule {}

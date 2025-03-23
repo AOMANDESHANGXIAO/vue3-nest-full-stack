@@ -15,6 +15,13 @@ export class UsersService {
     return this.userRepository.save(createUserDto);
   }
 
+  async findRolesById(id: string) {
+    return await this.userRepository.findOne({
+      where: { id },
+      relations: ['roles', 'roles.permissions'],
+    });
+  }
+
   findAll() {
     throw new Error('Method not implemented.');
     // return `This action returns all users`;

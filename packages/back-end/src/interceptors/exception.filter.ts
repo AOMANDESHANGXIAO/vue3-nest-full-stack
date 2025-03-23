@@ -12,6 +12,7 @@ import type { ApiResponse } from '@v3-nest-full-stack/shared-types';
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
+    console.log('exception', exception);
     const isHttpException = exception instanceof HttpException;
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

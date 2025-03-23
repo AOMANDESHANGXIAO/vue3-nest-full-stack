@@ -22,4 +22,5 @@ export const AuthUserConstant = {
   },
 };
 export const IS_PUBLIC_KEY = 'isPublic';
-export const SET_PERMISSIONS_KEY = 'setPermissions';
+export const REQUIRE_LOGIN_KEY = 'requireLogin';
+export const REQUIRE_PERMISSIONS_KEY = 'requirePermissions';

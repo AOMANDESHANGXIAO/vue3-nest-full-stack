@@ -12,8 +12,7 @@ export class RolesService implements OnModuleInit {
 
   async onModuleInit() {
     console.log('RolesService OnModuleInit');
-    // await this.initialize();
-    await this.reset();
+    await this.initialize();
   }
 
   async initialize() {
