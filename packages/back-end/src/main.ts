@@ -12,6 +12,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new AllExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors();
   await app.listen(config.port);
   console.log(`Application is running on: http://localhost:${config.port}`);
 }

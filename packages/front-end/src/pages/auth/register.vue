@@ -12,33 +12,56 @@ import { ref } from 'vue'
 import type { FormInstance } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form'
 import { UserOutlined, LockOutlined, EyeOutlined } from '@ant-design/icons-vue'
+import { UserApi } from '@/apis/modules/user'
+import { message } from 'ant-design-vue'
+import router from '@/routers'
+import _ from 'lodash'
 
 defineOptions({
   name: 'register',
 })
 
 const formRef = ref<FormInstance>()
-const loading = ref(false)
 
+// const formState = ref({
+//   username: '',
+//   password: '',
+//   nickname: '',
+//   repassword: '',
+// })
 const formState = ref({
-  username: '',
-  password: '',
-  repassword: '',
+  username: 'user_123',
+  password: '123abcABC',
+  nickname: '斌神',
+  repassword: '123abcABC',
 })
 
 const rules: Record<string, Rule[]> = {
   username: [
+    { required: true, message: '请输入用户名' },
+    { min: 3, message: '用户名至少3个字符' },
+    { max: 20, message: '用户名最多20个字符' },
     {
-      required: true,
-      message: '请输入用户名',
-      trigger: 'blur',
+      pattern: /^[a-zA-Z][a-zA-Z0-9_]{3,20}$/,
+      message: '用户名必须以字母开头,允许字母数字下划线',
     },
   ],
   password: [
+    { required: true, message: '请输入密码' },
+    { min: 6, message: '密码至少6个字符' },
+    { max: 15, message: '密码最多15个字符' },
     {
-      required: true,
-      message: '请输入密码',
-      trigger: 'blur',
+      pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,15}$/,
+      message: '密码必须包含至少一个大写字母、一个小写字母和一个数字',
+    },
+  ],
+  nickname: [
+    { required: true, message: '请输入昵称' },
+    { min: 2, message: '昵称至少2个字符' },
+    { max: 20, message: '昵称最多20个字符' },
+    {
+      pattern: /^[\u4e00-\u9fa5a-zA-Z0-9_\-\s·]+$/,
+      message: '昵称只能包含中文、字母、数字、下划线、横线、空格和点',
     },
   ],
   repassword: [
@@ -47,12 +70,33 @@ const rules: Record<string, Rule[]> = {
       message: '请输入确认密码',
       trigger: 'blur',
     },
+    {
+      validator(_, value) {
+        if (value === formState.value.password) {
+          return Promise.resolve()
+        }
+        return Promise.reject(new Error('两次输入的密码不一致'))
+      },
+      trigger: 'blur',
+    },
   ],
 }
-
-const handleFinish = async (values: any) => {
+const loading = ref(false)
+const handleFinish = async () => {
+  // 验证表单
+  await formRef.value?.validate()
   loading.value = true
-  console.log(values)
+  UserApi.register(_.omit(formState.value, ['repassword']))
+    .then(() => {
+      message.success('注册成功')
+      // 注册成功后跳转到登录页
+      router.push('/auth/login')
+      router.go(0)
+      console.log('注册成功')
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 </script>
 
@@ -73,7 +117,19 @@ const handleFinish = async (values: any) => {
         <a-input
           v-model:value="formState.username"
           size="large"
-          placeholder="用户名"
+          placeholder="账号"
+        >
+          <template #prefix>
+            <UserOutlined class="text-gray-400" />
+          </template>
+        </a-input>
+      </a-form-item>
+
+      <a-form-item name="nickname">
+        <a-input
+          v-model:value="formState.nickname"
+          size="large"
+          placeholder="昵称"
         >
           <template #prefix>
             <UserOutlined class="text-gray-400" />

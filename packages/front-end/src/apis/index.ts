@@ -5,7 +5,7 @@ import axios, {
 } from 'axios'
 import { message as antMessage } from 'ant-design-vue'
 import { useUserStore } from '@/stores/modules/use-user-store'
-import type { Response } from '@v3-nest-full-stack/shared'
+import type { ApiResponse } from '@v3-nest-full-stack/shared-types'
 import router, { routerMitter } from '@/routers'
 // Create axios instance
 const BASE_URL = import.meta.env.VITE_APP_API_URL
@@ -41,7 +41,7 @@ const httpCodeHandler = (code: number) => {
 // Response interceptor
 service.interceptors.response.use(
   (response: AxiosResponse) => {
-    const { code, message, data, success } = response.data as Response<any>
+    const { code, message, data, success } = response.data as ApiResponse<any>
     // Custom response code handling
     if (!success) {
       antMessage.error(message || '请求出错了~')
@@ -53,9 +53,9 @@ service.interceptors.response.use(
   },
   (error: AxiosError) => {
     console.error('Response interceptor error:', error)
-
+    const { data } = error!.response as unknown as ApiResponse<any>
     // Network error or timeout handling
-    antMessage.error(error.message || '网络异常~')
+    antMessage.error(data.message || '网络异常~')
 
     return Promise.reject(error)
   }

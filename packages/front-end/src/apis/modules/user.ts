@@ -1,6 +1,7 @@
 import service from '@/apis'
+import { type CreateUserDtoInterface } from '@v3-nest-full-stack/shared-types'
 
-const baseUrl = '/user'
+const baseUrl = '/users'
 
 export class UserApi {
   static async getUserInfo(): Promise<{
@@ -18,6 +19,13 @@ export class UserApi {
     return service({
       method: 'post',
       url: `${baseUrl}/login`,
+      data,
+    })
+  }
+  static async register(data: CreateUserDtoInterface): Promise<any> {
+    return service({
+      method: 'post',
+      url: `${baseUrl}`,
       data,
     })
   }

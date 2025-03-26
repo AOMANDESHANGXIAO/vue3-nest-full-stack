@@ -27,4 +27,16 @@ export class RolesService implements OnModuleInit {
     await this.initialize();
     return true;
   }
+
+  async findAll() {
+    return await this.roleRepository.find();
+  }
+
+  async findOne(id: string) {}
+
+  async create() {}
+
+  async update() {}
+
+  async delete() {}
 }

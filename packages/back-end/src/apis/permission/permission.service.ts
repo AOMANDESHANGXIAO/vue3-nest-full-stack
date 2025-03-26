@@ -46,4 +46,12 @@ export class PermissionService implements OnModuleInit {
     await this.initialize();
     return true;
   }
+
+  async findAll() {
+    return await this.permissionRepository.find();
+  }
+
+  async findOne(id: string) {
+    return await this.permissionRepository.findOneBy({ id });
+  }
 }

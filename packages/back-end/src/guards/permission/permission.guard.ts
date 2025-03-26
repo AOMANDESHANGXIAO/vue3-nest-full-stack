@@ -26,6 +26,13 @@ export class PermissionGuard implements CanActivate {
       if (request.user === undefined) {
         return true;
       }
+      const requirePermission: string = this.reflector.getAllAndOverride(
+        REQUIRE_PERMISSIONS_KEY,
+        [context.getHandler(), context.getClass()],
+      );
+      if (!requirePermission) {
+        return true;
+      }
       const user = await this.usersService.findRolesById(request.user.uuid);
       const roles = user.roles;
       const permissions: Permission[] = roles.reduce((total, current) => {
@@ -33,17 +40,13 @@ export class PermissionGuard implements CanActivate {
         return total;
       }, []);
 
-      const requirePermission: string = this.reflector.getAllAndOverride(
-        REQUIRE_PERMISSIONS_KEY,
-        [context.getHandler(), context.getClass()],
-      );
       const isPermitted = permissions.some(
         (item) => item.name === requirePermission,
       );
       console.log('user,s permission', permissions);
       console.log('requirePermission', requirePermission);
 
-      if (!isPermitted || requirePermission === void 0) {
+      if (!isPermitted) {
         throw new UnauthorizedException('您没有权限访问该接口');
       }
     } catch (e) {

@@ -17,6 +17,11 @@ export class ResourceController {
     return this.resourceService.getAllApis(req);
   }
 
+  @Get('controllers')
+  getAllControllers() {
+    return this.resourceService.getAllControllers();
+  }
+
   @Post('sync')
   syncAllApis(@Request() req: ExpressRequest) {
     return this.resourceService.syncAllApis(req);

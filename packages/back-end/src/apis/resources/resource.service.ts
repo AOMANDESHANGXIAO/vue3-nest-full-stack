@@ -3,13 +3,59 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Request as ExpressRequest, Router } from 'express';
 import { Repository } from 'typeorm';
 import { Resource } from 'src/entities/resource.entity';
+import { MetadataScanner, ModulesContainer } from '@nestjs/core';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class ResourceService {
   constructor(
     @InjectRepository(Resource)
     private resourceRepository: Repository<Resource>,
+    private readonly modulesContainer: ModulesContainer,
+    private readonly metadataScanner: MetadataScanner,
+    private readonly reflector: Reflector,
   ) {}
+
+  getAllControllers() {
+    // 获取所有的模块
+    console.log('modulesContainer', this.modulesContainer);
+    const modules = [...this.modulesContainer.values()];
+    const controllers = [];
+
+    for (const module of modules) {
+      for (const controller of [...module.controllers.values()]) {
+        const instance = controller.instance;
+        const prototype = Object.getPrototypeOf(instance);
+        const controllerPath = this.reflector.get('path', controller.metatype);
+
+        const methods = this.metadataScanner.scanFromPrototype(
+          instance,
+          prototype,
+          (methodName) => {
+            const routePath = this.reflector.get('path', instance[methodName]);
+            const requestMethod = this.reflector.get(
+              'method',
+              instance[methodName],
+            );
+
+            return {
+              methodName,
+              routePath,
+              requestMethod,
+            };
+          },
+        );
+
+        controllers.push({
+          controller: controller.metatype.name,
+          path: controllerPath,
+          methods: methods.filter((m) => m.routePath), // 过滤掉没有路由的方法
+        });
+      }
+    }
+    console.log('controllers', controllers);
+    return controllers;
+  }
   // 获取所有的后端api地址
   getAllApis(@Request() req: ExpressRequest) {
     const router = req.app._router as Router;

@@ -182,7 +182,7 @@ const handleLayoutChange = (item: AuthLayoutOption) => {
             leave-active-class="animate__animated animate__bounceOut"
           >
             <KeepAlive>
-              <component :is="Component" />
+              <component :is="Component" :key="$route.fullPath" />
             </KeepAlive>
           </Transition>
         </RouterView>

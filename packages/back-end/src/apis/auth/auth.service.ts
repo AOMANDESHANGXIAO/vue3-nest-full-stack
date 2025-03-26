@@ -1,18 +1,11 @@
-import {
-  Injectable,
-  ConflictException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login-dto';
 import { User } from 'src/entities/user.entity';
 import { Role } from 'src/entities/role.entity';
-import { RoleEnum } from '@v3-nest-full-stack/shared-types';
 import * as bcrypt from 'bcrypt';
-import * as _ from 'lodash';
 
 @Injectable()
 export class AuthService {
@@ -24,41 +17,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  // 业务用户注册
-  async createUser(createUserDto: CreateUserDto) {
-    // 检查账号是否已存在
-    const existingUser = await this.userRepository.findOne({
-      where: { username: createUserDto.username },
-    });
-
-    if (existingUser) {
-      throw new ConflictException('账号已存在');
-    }
-
-    // 对密码进行哈希处理
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
-    // 查询roleEnum
-    const role = await this.roleRepository.findOne({
-      where: { name: RoleEnum.User },
-    });
-    console.log('role', role);
-    // 创建新用户
-    const newUser = this.userRepository.create({
-      username: createUserDto.username,
-      password: hashedPassword,
-      nickname: createUserDto.nickname,
-      roles: [role],
-    });
-
-    // 保存用户到数据库
-    const result = await this.userRepository.save(newUser);
-    // 设置角色, 这里注册的用户是普通用户 RoleEnum.User
-    // 注册成功
-    return _.omit(result, ['password']);
-  }
-
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto): Promise<{ access_token: string }> {
     const { username, password } = loginDto;
     // 查找用户
     const user = await this.userRepository.findOne({

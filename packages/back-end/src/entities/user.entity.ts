@@ -15,6 +15,13 @@ export class User {
   id: string;
 
   @Column({
+    default: true,
+    comment: '该用户是否可用',
+    type: 'boolean',
+  })
+  status: boolean;
+
+  @Column({
     length: 50,
   })
   nickname: string;

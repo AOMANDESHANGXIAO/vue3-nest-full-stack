@@ -1,5 +1,4 @@
 import * as dotenv from 'dotenv';
-console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 
 const envHandler = () => {
   switch (process.env.NODE_ENV) {
