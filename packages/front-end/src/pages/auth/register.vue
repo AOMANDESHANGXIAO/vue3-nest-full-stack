@@ -83,20 +83,22 @@ const rules: Record<string, Rule[]> = {
 }
 const loading = ref(false)
 const handleFinish = async () => {
-  // 验证表单
-  await formRef.value?.validate()
-  loading.value = true
-  UserApi.register(_.omit(formState.value, ['repassword']))
-    .then(() => {
-      message.success('注册成功')
-      // 注册成功后跳转到登录页
-      router.push('/auth/login')
-      router.go(0)
-      console.log('注册成功')
+  try {
+    await formRef.value?.validate()
+    loading.value = true
+    await UserApi.register(_.omit(formState.value, ['repassword']))
+    message.success('注册成功')
+    loading.value = false
+    // 注册成功后跳转到登录页
+    router.push({
+      path: '/auth/login',
+      query: {
+        formState: JSON.stringify(formState.value),
+      },
     })
-    .finally(() => {
-      loading.value = false
-    })
+  } catch (error) {
+    loading.value = false
+  }
 }
 </script>
 

@@ -13,6 +13,8 @@ import type { FormInstance } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form'
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
 import { useUserStore } from '@/stores/modules/use-user-store'
+import { useRoute } from 'vue-router'
+import _ from 'lodash'
 
 defineOptions({
   name: 'login',
@@ -20,11 +22,23 @@ defineOptions({
 
 const formRef = ref<FormInstance>()
 const rememberMe = ref(false)
+const route = useRoute()
+console.log('路由跳转', route.query.formState)
+const queryFormState = route.query.formState
+  ? (_.pick(JSON.parse(route.query.formState as string), [
+      'username',
+      'password',
+    ]) as FormState)
+  : {
+      username: '',
+      password: '',
+    }
+interface FormState {
+  username: string
+  password: string
+}
 
-const formState = ref({
-  username: '',
-  password: '',
-})
+const formState = ref<FormState>(queryFormState)
 
 const rules: Record<string, Rule[]> = {
   username: [{ required: true, message: '请输入用户名' }],
