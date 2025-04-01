@@ -4,7 +4,7 @@ const baseUrl = '/auth'
 
 export class AuthApi {
   static async login(data: { username: string; password: string }): Promise<{
-    token: string
+    access_token: string
   }> {
     return service({
       method: 'post',
