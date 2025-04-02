@@ -225,7 +225,7 @@ const handleClickLogout = () => {
           <Bell />
 
           <a-space align="center" size="small">
-            <a-avatar :src="userStore.user!.avatarUrl"></a-avatar
+            <a-avatar src="https://www.bing.com/images/search?q=%E5%A4%B4%E5%83%8F&view=detailv2&FORM=IQFRBA&id=3F1C8999EA7BF90B749F48121299E12DE6724B30&selectedindex=7&&expw=400&exph=407&ccid=JCEcaQJV&ck=5860E5A1FEDBF670A6D800622611C236&simid=608010161488033324&thid=OIP.JCEcaQJVR_vC2kgt6BGZlAAAAA&idpp=serp&idpbck=1"></a-avatar
             ><span class="text-14px color-inherit">{{
               userStore.user!.username
             }}</span>

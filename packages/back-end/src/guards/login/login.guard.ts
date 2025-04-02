@@ -27,11 +27,12 @@ export class LoginGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-
+    
     const isRequiredLogin = this.reflector.getAllAndOverride<boolean>(
       REQUIRE_LOGIN_KEY,
       [context.getHandler(), context.getClass()],
     );
+    console.log('login guard isRequiredLogin', isRequiredLogin)
     if (!isRequiredLogin) {
       return true;
     }
