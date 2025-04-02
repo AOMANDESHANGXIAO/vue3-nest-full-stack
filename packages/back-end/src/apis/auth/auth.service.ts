@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login-dto';
 import { User } from 'src/entities/user.entity';
 import { Role } from 'src/entities/role.entity';
+import {type LoginApiResult} from '@v3-nest-full-stack/shared-types'
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -17,7 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(loginDto: LoginDto): Promise<{ access_token: string }> {
+  async login(loginDto: LoginDto): Promise<LoginApiResult> {
     const { username, password } = loginDto;
     // 查找用户
     const user = await this.userRepository.findOne({

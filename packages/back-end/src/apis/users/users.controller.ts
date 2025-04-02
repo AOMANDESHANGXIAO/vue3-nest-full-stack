@@ -1,12 +1,13 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RequireLogin, isPublic } from 'src/decorators/custom-decorator';
+import { Request as ExpressRequest } from 'express';
 
 @RequireLogin()
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @isPublic()
   @Post()
@@ -14,18 +15,13 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  /**
+   * 根据用户token中解析的uuid查询用户信息, 
+   * 这样的好处是用户只能查询自己的信息, 
+   * 而不能查询其他用户的信息, 防止用户信息泄露
+   */
   @Get()
-  findAll() {
-    return 'hello world';
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  findOne(@Request() req: ExpressRequest) {
+    return this.usersService.findOne(req);
   }
 }

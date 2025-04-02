@@ -2,15 +2,17 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { type Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
+import { type CreateUserDto } from './dto/create-user.dto';
+import { type FindOneUserApiResult } from '@v3-nest-full-stack/shared-types';
 import * as bcrypt from 'bcrypt';
 import * as _ from 'lodash';
+import { Request } from 'express';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<{
     user: Omit<User, 'password'>;
@@ -54,11 +56,12 @@ export class UsersService {
     // return `This action returns all users`;
   }
 
-  async findOne(id: string) {
+  async findOne(req: Request): Promise<FindOneUserApiResult> {
+    const user = req.user
     return {
       user: _.omit(
         await this.userRepository.findOne({
-          where: { id, status: true },
+          where: { id: user.uuid, status: true },
         }),
         ['password'],
       ),

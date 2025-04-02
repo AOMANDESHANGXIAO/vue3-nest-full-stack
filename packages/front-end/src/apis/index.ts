@@ -22,7 +22,7 @@ service.interceptors.request.use(
     const token = getToken()
     // Add token to request headers if exists
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`
+      config.headers['Authorization'] = token
     }
 
     return config
@@ -33,7 +33,7 @@ service.interceptors.request.use(
   }
 )
 // TODO: 完善
-const httpCodeHandler = (code: number) => {
+const errorCodeHandler = (code: number) => {
   if (code === 401) {
     routerMitter.emit('noAuth', router)
   }
@@ -41,11 +41,10 @@ const httpCodeHandler = (code: number) => {
 // Response interceptor
 service.interceptors.response.use(
   (response: AxiosResponse) => {
-    const { code, message, data, success } = response.data as ApiResponse<any>
+    const { message, data, success } = response.data as ApiResponse<any>
     // Custom response code handling
     if (!success) {
       antMessage.error(message || '请求出错了~')
-      httpCodeHandler(code)
       return Promise.reject(new Error(message || 'Error'))
     }
 
@@ -53,7 +52,8 @@ service.interceptors.response.use(
   },
   (error: AxiosError) => {
     console.error('Response interceptor error:', error)
-    const { data } = error!.response as unknown as ApiResponse<any>
+    const { data,code } = error!.response as unknown as ApiResponse<any>
+    errorCodeHandler(code)
     // Network error or timeout handling
     antMessage.error(data.message || '网络异常~')
 
