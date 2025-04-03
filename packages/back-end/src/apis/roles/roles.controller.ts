@@ -5,12 +5,16 @@ import {
   Delete,
   Get,
   Param,
+  Body,
   ParseUUIDPipe,
   Query,
   ParseIntPipe,
+  Request,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { RequireLogin } from 'src/decorators/custom-decorator';
+import { CreateRoleDto } from './dto/create-role.dto';
+import { Request as ExpressRequest } from 'express';
 
 @RequireLogin()
 @Controller('roles')
@@ -19,7 +23,12 @@ export class RolesController {
 
   // 增删改查
   @Post()
-  async create() {}
+  async create(
+    @Body() createRoleDto: CreateRoleDto,
+    @Request() req: ExpressRequest,
+  ) {
+    return this.rolesService.create(createRoleDto, req);
+  }
 
   @Patch(':id')
   async update(@Param('id', ParseUUIDPipe) id: string) {}

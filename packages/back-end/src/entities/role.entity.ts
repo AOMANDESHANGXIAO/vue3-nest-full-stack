@@ -7,6 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Unique
 } from 'typeorm';
 import { Permission } from './permission.entity';
 import { User } from './user.entity';
@@ -16,6 +17,7 @@ export class Role {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Unique(['name'])
   @Column({
     length: 20,
   })
@@ -24,7 +26,7 @@ export class Role {
   @Column({
     length: 100,
   })
-  des: string;
+  desc: string;
 
   @Column({
     default: true,
