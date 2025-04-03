@@ -1,35 +1,20 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from 'src/entities/role.entity';
 import { Repository } from 'typeorm';
-import { config } from 'src/config';
 
 @Injectable()
-export class RolesService implements OnModuleInit {
+export class RolesService {
   constructor(
     @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
   ) {}
 
-  async onModuleInit() {
-    console.log('RolesService OnModuleInit');
-    await this.initialize();
-  }
-
-  async initialize() {
-    if (await this.roleRepository.count()) return;
-    const initRoles = config.roles.map((item) => ({ name: item.name }));
-    await this.roleRepository.save(initRoles);
-    return true;
-  }
-
-  async reset() {
-    await this.roleRepository.delete({});
-    await this.initialize();
-    return true;
-  }
-
-  async findAll() {
-    return await this.roleRepository.find();
+  async findAll(size: number, page: number) {
+    const [data, total] = await this.roleRepository.findAndCount({
+      take: size,
+      skip: (page - 1) * size,
+    });
+    return { list: data, total };
   }
 
   async findOne(id: string) {}

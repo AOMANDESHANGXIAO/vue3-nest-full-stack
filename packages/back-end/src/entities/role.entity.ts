@@ -4,10 +4,12 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Permission } from './permission.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class Role {
@@ -19,11 +21,33 @@ export class Role {
   })
   name: string;
 
+  @Column({
+    length: 100,
+  })
+  des: string;
+
+  @Column({
+    default: true,
+  })
+  status: boolean;
+
   @CreateDateColumn()
   createTime: Date;
 
   @UpdateDateColumn()
   updateTime: Date;
+
+  @ManyToOne(() => User)
+  @JoinTable({
+    name: 'created_by_id',
+  })
+  createdBy: User;
+
+  @ManyToOne(() => User)
+  @JoinTable({
+    name: 'updated_by_id',
+  })
+  updatedBy: User;
 
   @ManyToMany(() => Permission)
   @JoinTable({
