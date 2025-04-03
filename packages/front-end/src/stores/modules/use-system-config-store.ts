@@ -139,6 +139,7 @@ export const useSystemConfigStore = defineStore('system-config-store', () => {
     themeKey: 'shenlan',
     cssVars: _.merge({}, defaultCssVars, getThemeCssVarsByKey('shenlan')),
     authLayout: 'right' as AuthLayoutOption['key'],
+    appTitle: import.meta.env.VITE_APP_TITLE,
   })
   const removeCache = () => {
     localStorage.clear()
