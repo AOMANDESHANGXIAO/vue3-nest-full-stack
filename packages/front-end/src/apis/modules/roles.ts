@@ -1,5 +1,8 @@
 import service from "@/apis";
-import { type GetRoleListResult } from "@v3-nest-full-stack/shared-types";
+import {
+  type GetRoleListResult,
+  type CreateRoleInterface,
+} from "@v3-nest-full-stack/shared-types";
 
 const baseUrl = "/roles";
 
@@ -13,5 +16,12 @@ export class RolesApi {
       url: `${baseUrl}`,
       params,
     });
+  }
+  static async createRole(data:CreateRoleInterface) {
+    return service({
+      method: "post",
+      url: `${baseUrl}`,
+      data, 
+    })
   }
 }
