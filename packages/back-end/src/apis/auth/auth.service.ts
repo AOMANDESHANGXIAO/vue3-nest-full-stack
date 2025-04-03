@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login-dto';
 import { User } from 'src/entities/user.entity';
 import { Role } from 'src/entities/role.entity';
-import {type LoginApiResult} from '@v3-nest-full-stack/shared-types'
+import { type LoginApiResult } from '@v3-nest-full-stack/shared-types';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -21,10 +21,12 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<LoginApiResult> {
     const { username, password } = loginDto;
     // 查找用户
-    const user = await this.userRepository.findOne({
-      where: { username },
-      relations: ['roles'], // 加载roles关系
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.username = :username', { username })
+      .addSelect('user.password') // 显式选择密码字段
+      .leftJoinAndSelect('user.roles', 'roles')
+      .getOne();
 
     // 验证用户是否存在
     if (!user) {
