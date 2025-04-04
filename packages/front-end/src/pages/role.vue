@@ -26,31 +26,30 @@ import type {
 } from '@v3-nest-full-stack/shared-types'
 import { type FormInstance, message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form'
+import _ from 'lodash'
+import type { ColumnType } from 'ant-design-vue/es/table'
 
 defineOptions({
   name: 'role',
 })
-const columns = [
+const columns: ColumnType[] = [
   {
     title: '角色名称',
     dataIndex: 'name',
     key: 'name',
+    align: 'center',
   },
   {
     title: '描述',
     dataIndex: 'desc',
     key: 'desc',
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    key: 'status',
-    customRender: ({ text }: { text: boolean }) => (text ? '启用' : '禁用'),
+    align: 'center',
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    align: 'center',
   },
   {
     title: '创建人',
@@ -63,12 +62,14 @@ const columns = [
         createdBy: RoleOperatorRecord
       }
     }) => record.createdBy.username,
+    align: 'center',
   },
   {
     title: '操作',
     dataIndex: 'action',
     key: 'action',
     width: 150,
+    align: 'center',
   },
 ]
 const defaultQueryParams = {
@@ -76,7 +77,7 @@ const defaultQueryParams = {
   page: 1, // 当前页码
   size: 5, // 每页显示条数
 }
-const queryParams = ref(defaultQueryParams)
+const queryParams = ref(_.cloneDeep(defaultQueryParams))
 const { state, isLoading, execute } = useAsyncState(
   RolesApi.getRoles,
   {
@@ -151,16 +152,17 @@ const patch = async () => {
     isConfirmLoading.value = false
   }
 }
+const isDeleteLoading = ref(false)
 const _delete = async () => {
   try {
-    isConfirmLoading.value = true
+    isDeleteLoading.value = true
     await RolesApi.deleteRole(id)
     message.success('删除成功')
     handleSearch()
   } catch (e) {
     console.error(e)
   } finally {
-    isConfirmLoading.value = false
+    isDeleteLoading.value = false
   }
 }
 const handleEdit = (record: GetRoleListResult['list'][number]) => {
@@ -258,11 +260,16 @@ const handleDelete = (record: GetRoleListResult['list'][number]) => {
             >
               编辑</a-button
             >
-            <a-button
-              danger
-              @click="handleDelete(record as GetRoleListResult['list'][number])"
-              >删除</a-button
+            <a-popconfirm
+              title="你确定要删除吗？"
+              ok-text="确定"
+              cancel-text="取消"
+              @confirm="
+                handleDelete(record as GetRoleListResult['list'][number])
+              "
             >
+              <a-button danger :loading="isDeleteLoading">删除</a-button>
+            </a-popconfirm>
           </div>
         </template>
       </template>
