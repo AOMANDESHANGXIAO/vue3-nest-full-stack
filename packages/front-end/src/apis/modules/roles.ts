@@ -1,27 +1,41 @@
-import service from "@/apis";
+import service from '@/apis'
 import {
   type GetRoleListResult,
   type CreateRoleInterface,
-} from "@v3-nest-full-stack/shared-types";
+} from '@v3-nest-full-stack/shared-types'
+import { type UpdateRoleInterface } from '@v3-nest-full-stack/shared-types'
 
-const baseUrl = "/roles";
+const baseUrl = '/roles'
 
 export class RolesApi {
   static async getRoles(params: {
-    page: number;
-    size: number;
+    page: number
+    size: number
   }): Promise<GetRoleListResult> {
     return service({
-      method: "get",
+      method: 'get',
       url: `${baseUrl}`,
       params,
-    });
+    })
   }
-  static async createRole(data:CreateRoleInterface) {
+  static async createRole(data: CreateRoleInterface) {
     return service({
-      method: "post",
+      method: 'post',
       url: `${baseUrl}`,
-      data, 
+      data,
+    })
+  }
+  static async updateRole(id: string,data: UpdateRoleInterface) {
+    return service({
+      method: 'patch',
+      url: `${baseUrl}/${id}`,
+      data,
+    })
+  }
+  static async deleteRole(id: string) {
+    return service({
+      method: 'delete',
+      url: `${baseUrl}/${id}`,
     })
   }
 }

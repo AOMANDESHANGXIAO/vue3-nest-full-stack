@@ -20,6 +20,8 @@ export class RolesService {
       take: size,
       skip: (page - 1) * size,
       relations: { createdBy: true, updatedBy: true },
+      where: { status: true },
+      order: { createTime: 'DESC' },
     });
     return { list: data, total };
   }

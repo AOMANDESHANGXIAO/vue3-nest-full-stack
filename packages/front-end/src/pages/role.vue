@@ -11,75 +11,72 @@
 </route>
 
 <script lang="ts" setup>
-import ContentContainer from "@/components/layouts/content-container.vue";
-import { RolesApi } from "@/apis/modules/roles";
-import { useAsyncState } from "@vueuse/core";
+import ContentContainer from '@/components/layouts/content-container.vue'
+import { RolesApi } from '@/apis/modules/roles'
+import { useAsyncState } from '@vueuse/core'
 import {
   PlusOutlined,
   UndoOutlined,
   SearchOutlined,
-} from "@ant-design/icons-vue";
-import { type CreateRoleInterface } from "@v3-nest-full-stack/shared-types";
-import { type FormInstance, message } from "ant-design-vue";
-import type { Rule } from "ant-design-vue/es/form";
+} from '@ant-design/icons-vue'
+import type {
+  CreateRoleInterface,
+  GetRoleListResult,
+  RoleOperatorRecord,
+} from '@v3-nest-full-stack/shared-types'
+import { type FormInstance, message } from 'ant-design-vue'
+import type { Rule } from 'ant-design-vue/es/form'
 
 defineOptions({
-  name: "role",
-});
+  name: 'role',
+})
 const columns = [
   {
-    title: "角色名称",
-    dataIndex: "name",
-    key: "name",
+    title: '角色名称',
+    dataIndex: 'name',
+    key: 'name',
   },
   {
-    title: "描述",
-    dataIndex: "desc",
-    key: "desc",
+    title: '描述',
+    dataIndex: 'desc',
+    key: 'desc',
   },
   {
-    title: "状态",
-    dataIndex: "status",
-    key: "status",
-    customRender: ({ text }: { text: boolean }) => (text ? "启用" : "禁用"),
+    title: '状态',
+    dataIndex: 'status',
+    key: 'status',
+    customRender: ({ text }: { text: boolean }) => (text ? '启用' : '禁用'),
   },
   {
-    title: "创建时间",
-    dataIndex: "createTime",
-    key: "createTime",
+    title: '创建时间',
+    dataIndex: 'createTime',
+    key: 'createTime',
   },
   {
-    title: "创建人",
-    dataIndex: ["createdBy", "username"],
-    key: "createdBy",
+    title: '创建人',
+    dataIndex: ['createdBy', 'username'],
+    key: 'createdBy',
     customRender: ({
       record,
     }: {
       record: {
-        createdBy: {
-          id: string;
-          status: boolean;
-          nickname: string;
-          username: string;
-          createTime: Date;
-          updateTime: Date;
-        };
-      };
+        createdBy: RoleOperatorRecord
+      }
     }) => record.createdBy.username,
   },
   {
-    title: "操作",
-    dataIndex: "action",
-    key: "action",
+    title: '操作',
+    dataIndex: 'action',
+    key: 'action',
     width: 150,
   },
-];
+]
 const defaultQueryParams = {
-  roleName: "", // 角色名称
+  roleName: '', // 角色名称
   page: 1, // 当前页码
   size: 5, // 每页显示条数
-};
-const queryParams = ref(defaultQueryParams);
+}
+const queryParams = ref(defaultQueryParams)
 const { state, isLoading, execute } = useAsyncState(
   RolesApi.getRoles,
   {
@@ -89,53 +86,96 @@ const { state, isLoading, execute } = useAsyncState(
   {
     immediate: false,
   }
-);
+)
 onMounted(() => {
-  handleSearch();
-});
+  handleSearch()
+})
 
 const handleSearch = () => {
-  execute(0, queryParams.value);
-};
+  execute(0, queryParams.value)
+}
 const handleReset = () => {
-  queryParams.value = { ...defaultQueryParams };
-  handleSearch();
-};
-const isModalOpen = ref(false);
-const handleOpenModal = () => {
-  isModalOpen.value = true;
-};
+  queryParams.value = { ...defaultQueryParams }
+  handleSearch()
+}
+const isModalOpen = ref(false)
+const handleCreate = () => {
+  handleSubmit = create
+  isModalOpen.value = true
+}
 const formData = ref<CreateRoleInterface>({
-  name: "",
-  desc: "",
-});
-const formRef = ref<FormInstance>();
+  name: '',
+  desc: '',
+})
+const formRef = ref<FormInstance>()
 const rules: Record<string, Rule[]> = {
   name: [
-    { required: true, message: "角色名称不能为空", trigger: "blur" },
-    { max: 50, message: "名称长度不能超过50个字符", trigger: "blur" },
+    { required: true, message: '角色名称不能为空', trigger: 'blur' },
+    { max: 50, message: '名称长度不能超过50个字符', trigger: 'blur' },
   ],
   desc: [
-    { required: true, message: "角色描述不能为空", trigger: "blur" },
-    { max: 200, message: "描述长度不能超过200个字符", trigger: "blur" },
+    { required: true, message: '角色描述不能为空', trigger: 'blur' },
+    { max: 200, message: '描述长度不能超过200个字符', trigger: 'blur' },
   ],
-};
-const isConfirmLoading = ref(false);
-const handleSubmit = async () => {
+}
+const isConfirmLoading = ref(false)
+const create = async () => {
   try {
-    isConfirmLoading.value = true;
-    await formRef.value?.validate();
-    await RolesApi.createRole(formData.value);
-    message.success("创建成功");
-    isModalOpen.value = false;
-    formRef.value?.resetFields();
-    handleSearch();
+    isConfirmLoading.value = true
+    await formRef.value?.validate()
+    await RolesApi.createRole(formData.value)
+    message.success('创建成功')
+    isModalOpen.value = false
+    formRef.value?.resetFields()
+    handleSearch()
   } catch (e) {
-    console.error(e);
+    console.error(e)
   } finally {
-    isConfirmLoading.value = false;
+    isConfirmLoading.value = false
   }
-};
+}
+let handleSubmit = create
+let id = ''
+const patch = async () => {
+  try {
+    isConfirmLoading.value = true
+    await formRef.value?.validate()
+    await RolesApi.updateRole(id, formData.value)
+    message.success('更新成功')
+    isModalOpen.value = false
+    formRef.value?.resetFields()
+    handleSearch()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isConfirmLoading.value = false
+  }
+}
+const _delete = async () => {
+  try {
+    isConfirmLoading.value = true
+    await RolesApi.deleteRole(id)
+    message.success('删除成功')
+    handleSearch()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isConfirmLoading.value = false
+  }
+}
+const handleEdit = (record: GetRoleListResult['list'][number]) => {
+  id = record.id
+  handleSubmit = patch
+  formData.value = {
+    name: record.name,
+    desc: record.desc,
+  }
+  isModalOpen.value = true
+}
+const handleDelete = (record: GetRoleListResult['list'][number]) => {
+  id = record.id
+  _delete()
+}
 </script>
 
 <template>
@@ -185,7 +225,7 @@ const handleSubmit = async () => {
         </a-button>
       </a-form-item>
       <a-form-item class="absolute right-0">
-        <a-button type="primary" class="ml-2" @click="handleOpenModal">
+        <a-button type="primary" class="ml-2" @click="handleCreate">
           <PlusOutlined />
           <span>新增</span>
         </a-button>
@@ -199,8 +239,8 @@ const handleSubmit = async () => {
       :pagination="{
         showSizeChanger: true,
         showQuickJumper: true,
-        total:state.total,
-        showTotal: (total:number) => `共 ${total} 条`,
+        total: state.total,
+        showTotal: (total: number) => `共 ${total} 条`,
       }"
       :loading="isLoading"
       bordered
@@ -211,8 +251,18 @@ const handleSubmit = async () => {
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'action'">
           <div class="flex items-center">
-            <a-button type="primary" class="mr-2">编辑</a-button>
-            <a-button danger>删除</a-button>
+            <a-button
+              type="primary"
+              class="mr-2"
+              @click="handleEdit(record as GetRoleListResult['list'][number])"
+            >
+              编辑</a-button
+            >
+            <a-button
+              danger
+              @click="handleDelete(record as GetRoleListResult['list'][number])"
+              >删除</a-button
+            >
           </div>
         </template>
       </template>

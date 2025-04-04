@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  Unique
+  Unique,
 } from 'typeorm';
 import { Permission } from './permission.entity';
 import { User } from './user.entity';
