@@ -14,6 +14,7 @@ import {
 import { RolesService } from './roles.service';
 import { RequireLogin } from 'src/decorators/custom-decorator';
 import { CreateRoleDto } from './dto/create-role.dto';
+import { UpdateRoleDto } from './dto/update-role.dto';
 import { Request as ExpressRequest } from 'express';
 
 @RequireLogin()
@@ -30,18 +31,29 @@ export class RolesController {
     return this.rolesService.create(createRoleDto, req);
   }
 
-  @Patch(':id')
-  async update(@Param('id', ParseUUIDPipe) id: string) {}
-
   @Delete(':id')
-  async delete(@Param('id', ParseUUIDPipe) id: string) {}
+  async delete(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Request() req: ExpressRequest,
+  ) {
+    return this.rolesService.delete(id, req);
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateRoleDto: UpdateRoleDto,
+    @Request() req: ExpressRequest,
+  ) {
+    return this.rolesService.update(id, updateRoleDto, req);
+  }
 
   @Get()
   async findAll(
     @Query('size', ParseIntPipe) size: number,
     @Query('page', ParseIntPipe) page: number,
   ) {
-    return await this.rolesService.findAll(size, page);
+    return this.rolesService.findAll(size, page);
   }
 
   @Get(':id')
