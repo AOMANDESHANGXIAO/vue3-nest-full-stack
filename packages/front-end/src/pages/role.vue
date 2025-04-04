@@ -28,6 +28,7 @@ import { type FormInstance, message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form'
 import _ from 'lodash'
 import type { ColumnType } from 'ant-design-vue/es/table'
+import { commonDateFormatter } from '@/utils/time'
 
 defineOptions({
   name: 'role',
@@ -50,6 +51,7 @@ const columns: ColumnType[] = [
     dataIndex: 'createTime',
     key: 'createTime',
     align: 'center',
+    customRender: ({ text }) => commonDateFormatter(text),
   },
   {
     title: '创建人',
