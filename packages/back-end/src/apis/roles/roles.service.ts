@@ -15,14 +15,25 @@ export class RolesService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll(size: number, page: number): Promise<GetRoleListResult> {
-    const [data, total] = await this.roleRepository.findAndCount({
-      take: size,
-      skip: (page - 1) * size,
-      relations: { createdBy: true, updatedBy: true },
-      where: { status: true },
-      order: { createTime: 'DESC' },
-    });
+  async findAll(
+    size: number,
+    page: number,
+    keyWord?: string,
+  ): Promise<GetRoleListResult> {
+    const queryBuilder = this.roleRepository
+      .createQueryBuilder('role')
+      .leftJoinAndSelect('role.createdBy', 'createdBy')
+      .leftJoinAndSelect('role.updatedBy', 'updatedBy')
+      .where('role.status = :status', { status: true })
+      .orderBy('role.createTime', 'DESC')
+      .take(size)
+      .skip((page - 1) * size);
+
+    if (keyWord) {
+      queryBuilder.andWhere('role.name LIKE :name', { name: `%${keyWord}%` });
+    }
+
+    const [data, total] = await queryBuilder.getManyAndCount();
     return { list: data, total };
   }
 

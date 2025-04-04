@@ -72,7 +72,7 @@ const columns = [
   },
 ]
 const defaultQueryParams = {
-  roleName: '', // 角色名称
+  keyWord: '', // 角色名称
   page: 1, // 当前页码
   size: 5, // 每页显示条数
 }
@@ -212,7 +212,7 @@ const handleDelete = (record: GetRoleListResult['list'][number]) => {
     <!--- 搜索表单 --->
     <a-form layout="inline" class="mb-4 relative">
       <a-form-item label="角色名称">
-        <a-input v-model:value="queryParams.roleName" placeholder="请输入" />
+        <a-input v-model:value="queryParams.keyWord" placeholder="请输入" />
       </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="handleSearch">
