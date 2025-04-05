@@ -3,7 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { type Repository } from 'typeorm';
 import { type CreateUserDto } from './dto/create-user.dto';
-import { type FindOneUserApiResult } from '@v3-nest-full-stack/shared-types';
+import type {
+  FindOneUserApiResult,
+  FindAllUsersApiResult,
+} from '@v3-nest-full-stack/shared-types';
 import * as bcrypt from 'bcrypt';
 import * as _ from 'lodash';
 import { Request } from 'express';
@@ -12,7 +15,7 @@ import { Request } from 'express';
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<{
     user: Omit<User, 'password'>;
@@ -51,20 +54,27 @@ export class UsersService {
     });
   }
 
-  findAll() {
-    throw new Error('Method not implemented.');
-    // return `This action returns all users`;
+  async findAll(
+    current: number,
+    pageSize: number,
+  ): Promise<FindAllUsersApiResult> {
+    const [users, total] = await this.userRepository.findAndCount({
+      relations: ['roles'],
+      take: pageSize,
+      skip: (current - 1) * pageSize,
+    });
+    return {
+      list: users,
+      total,
+    };
   }
 
   async findOne(req: Request): Promise<FindOneUserApiResult> {
-    const user = req.user
+    const user = req.user;
     return {
-      user: _.omit(
-        await this.userRepository.findOne({
-          where: { id: user.uuid, status: true },
-        }),
-        ['password'],
-      ),
+      user: await this.userRepository.findOne({
+        where: { id: user.uuid, status: true },
+      }),
     };
   }
 

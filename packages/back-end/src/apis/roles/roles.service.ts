@@ -37,8 +37,6 @@ export class RolesService {
     return { list: data, total };
   }
 
-  async findOne(id: string) {}
-
   async create(createRoleDto: CreateRoleDto, req: Request) {
     const user = await this.userRepository.findOneBy({ id: req.user.uuid });
     await this.roleRepository.save({

@@ -1,5 +1,9 @@
 import service from '@/apis'
-import { type CreateUserDtoInterface, type FindOneUserApiResult } from '@v3-nest-full-stack/shared-types'
+import type {
+  CreateUserDtoInterface,
+  FindOneUserApiResult,
+  FindAllUsersApiResult,
+} from '@v3-nest-full-stack/shared-types'
 
 const baseUrl = '/users'
 
@@ -15,6 +19,16 @@ export class UserApi {
       method: 'post',
       url: `${baseUrl}`,
       data,
+    })
+  }
+  static async getAllUsers(params: {
+    pageSize: number
+    current: number
+  }): Promise<FindAllUsersApiResult> {
+    return service({
+      method: 'get',
+      url: `${baseUrl}/all`,
+      params,
     })
   }
 }

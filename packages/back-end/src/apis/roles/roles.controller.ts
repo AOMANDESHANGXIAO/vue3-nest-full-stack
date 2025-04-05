@@ -56,9 +56,4 @@ export class RolesController {
   ) {
     return this.rolesService.findAll(size, page, keyWord);
   }
-
-  @Get(':id')
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.rolesService.findOne(id);
-  }
 }

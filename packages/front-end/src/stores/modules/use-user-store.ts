@@ -18,10 +18,8 @@ export const useUserStore = defineStore('user-store', () => {
   const token = useLocalStorage('access_token', '')
   const isAuthenticated = computed(() => {
     return !!token.value
-    // return true
   })
   const user = ref<UserVO | null>(null)
-  // TODO: 完善后端后再来
   const initUser = async () => {
     // 使用token来获取用户的信息
     const res = await UserApi.getUserInfo()
