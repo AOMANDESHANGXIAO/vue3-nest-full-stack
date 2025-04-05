@@ -38,5 +38,6 @@ declare module 'vue' {
     MenuPageContent: typeof import('./src/components/business/menu-page-content.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Table: typeof import('./src/components/ant/Table.vue')['default']
   }
 }

@@ -28,7 +28,9 @@ import { type FormInstance, message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form'
 import _ from 'lodash'
 import type { ColumnType } from 'ant-design-vue/es/table'
+import { useElementSize } from '@vueuse/core'
 import { commonDateFormatter } from '@/utils/time'
+import Table from '@/components/ant/Table.vue'
 
 defineOptions({
   name: 'role',
@@ -75,6 +77,7 @@ const columns: ColumnType[] = [
     key: 'action',
     width: 150,
     align: 'center',
+    fixed: 'right',
   },
 ]
 const defaultQueryOptions = {
@@ -86,8 +89,8 @@ const defaultQueryOptions = {
   current: 1,
   keyWord: '',
   pageSizeOptions: ['5', '10', '20', '50'],
-  async onChange(page: number, pageSize: number){
-    this.current = page
+  async onChange(current: number, pageSize: number) {
+    this.current = current
     this.pageSize = pageSize
     await nextTick()
     handleSearch()
@@ -95,11 +98,7 @@ const defaultQueryOptions = {
 }
 const queryOptions = ref(_.cloneDeep(defaultQueryOptions))
 const queryParams = computed(() => {
-  return {
-    keyWord: queryOptions.value.keyWord,
-    current: queryOptions.value.current,
-    pageSize: queryOptions.value.pageSize,
-  }
+  return _.pick(queryOptions.value, ['keyWord', 'current', 'pageSize'])
 })
 const { state, isLoading, execute } = useAsyncState(
   UserApi.getAllUsers,
@@ -122,15 +121,30 @@ const handleSearch = () => {
   execute(0, queryParams.value)
 }
 const handleReset = async () => {
-  queryOptions.value = { ...defaultQueryOptions }
+  queryOptions.value = _.cloneDeep(defaultQueryOptions)
   await nextTick()
   handleSearch()
 }
 const isModalOpen = ref(false)
+const contentContainerRef = useTemplateRef('contentContainerRef')
+const searchFormRef = useTemplateRef('searchFormRef')
+const { width, height } = useElementSize(contentContainerRef)
+const { height: searchFormHeight } = useElementSize(searchFormRef)
+const aAtableScroll = computed(() => {
+  return {
+    y: height.value - searchFormHeight.value,
+  }
+})
+watch(
+  () => aAtableScroll.value,
+  val => {
+    console.log(val)
+  }
+)
 </script>
 
 <template>
-  <ContentContainer>
+  <ContentContainer ref="contentContainerRef">
     <a-modal
       v-model:open="isModalOpen"
       ok-text="确定"
@@ -158,7 +172,7 @@ const isModalOpen = ref(false)
     </a-modal>
 
     <!--- 搜索表单 --->
-    <a-form layout="inline" class="mb-4 relative">
+    <a-form layout="inline" class="mb-4 relative" ref="searchFormRef">
       <a-form-item label="角色名称">
         <a-input v-model:value="queryOptions.keyWord" placeholder="请输入" />
       </a-form-item>
@@ -180,34 +194,43 @@ const isModalOpen = ref(false)
       </a-form-item>
     </a-form>
 
-    <!--- 表格区域 --->
-    <a-table
-      :columns="columns"
-      :data-source="state.list"
-      v-model:pagination="queryOptions"
-      :loading="isLoading"
-      bordered
+    <section
+      class="w-full"
+      :style="{ height: `calc(100% - ${searchFormHeight}px - 30px)` }"
     >
-      <template #headerCell="{ column }">
-        <span class="font-bold">{{ column.title }}</span>
-      </template>
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.dataIndex === 'action'">
-          <div class="flex items-center">
-            <a-button type="primary" class="mr-2"> 编辑</a-button>
-            <a-popconfirm
-              title="你确定吗？"
-              ok-text="确定"
-              cancel-text="取消"
-              @confirm=""
-            >
-              <a-button danger>删除</a-button>
-            </a-popconfirm>
-          </div>
+      <!--- 表格区域 --->
+      <a-table
+        :columns="columns"
+        :data-source="state.list"
+        v-model:pagination="queryOptions"
+        :scroll="{ x: '100%', y: 'max-content' }"
+        :loading="isLoading"
+      >
+        <template #headerCell="{ column }">
+          <span class="font-bold">{{ column.title }}</span>
         </template>
-      </template>
-    </a-table>
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.dataIndex === 'action'">
+            <div class="flex items-center">
+              <a-button type="primary" class="mr-2"> 编辑</a-button>
+              <a-popconfirm
+                title="你确定吗？"
+                ok-text="确定"
+                cancel-text="取消"
+                @confirm=""
+              >
+                <a-button danger>删除</a-button>
+              </a-popconfirm>
+            </div>
+          </template>
+        </template>
+      </a-table>
+    </section>
   </ContentContainer>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+// WARNING: 如果你使用了ant-design的table组件一定要引用这个样式
+// 这个样式用来解决表格的宽度和高度自适应问题
+@import url('@/styles/a-table.scss');
+</style>
