@@ -4,6 +4,7 @@ import type {
   AdminAddUserDtoInterface,
   FindOneUserApiResult,
   FindAllUsersApiResult,
+  UpdateUserDtoInterface,
 } from '@v3-nest-full-stack/shared-types'
 
 const baseUrl = '/users'
@@ -36,6 +37,16 @@ export class UserApi {
     return service({
       method: 'post',
       url: `${baseUrl}/add`,
+      data,
+    })
+  }
+  static async updateUser(
+    id: string,
+    data: UpdateUserDtoInterface
+  ): Promise<any> {
+    return service({
+      method: 'patch',
+      url: `${baseUrl}/${id}`,
       data,
     })
   }

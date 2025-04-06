@@ -6,6 +6,11 @@ export interface CreateUserDtoInterface {
 export interface AdminAddUserDtoInterface extends CreateUserDtoInterface {
   roleIds?: string[]
 }
+export interface UpdateUserDtoInterface
+  extends Partial<CreateUserDtoInterface> {
+  status?: boolean
+  roleIds?: string[]
+}
 export interface FindOneUserApiResult {
   user: {
     id: string
@@ -16,7 +21,6 @@ export interface FindOneUserApiResult {
     updateTime: Date
   }
 }
-
 export interface UserResponse {
   id: string
   status: boolean
@@ -26,7 +30,6 @@ export interface UserResponse {
   updateTime: Date
   roles: any[] // 如果roles有具体结构，可以进一步定义
 }
-
 export interface FindAllUsersApiResult {
   list: UserResponse[]
   total: number

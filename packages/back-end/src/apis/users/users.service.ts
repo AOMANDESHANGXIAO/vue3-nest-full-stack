@@ -138,8 +138,6 @@ export class UsersService {
       // 检查账号是否已存在
       const existingUser = await this.userRepository.findOne({
         where: { username: updateUserDto.username, id: Not(id) },
-        // 排除当前用户
-        // where: { username: updateUserDto.username, id: Not(id) },
       });
 
       if (existingUser) {

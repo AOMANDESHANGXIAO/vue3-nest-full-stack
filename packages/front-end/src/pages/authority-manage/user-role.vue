@@ -27,6 +27,8 @@ import type { ColumnType } from 'ant-design-vue/es/table'
 import { useElementSize } from '@vueuse/core'
 import { commonDateFormatter } from '@/utils/time'
 import type { FormInstance, Rule } from 'ant-design-vue/es/form'
+import type { FindAllUsersApiResult } from '@v3-nest-full-stack/shared-types'
+import AsyncFormRender from '@/components/ant/async-form-render.vue'
 
 defineOptions({
   name: 'role',
@@ -80,7 +82,7 @@ const columns: ColumnType[] = [
     title: '操作',
     dataIndex: 'action',
     key: 'action',
-    width: 170,
+    width: 100,
     align: 'center',
     fixed: 'right',
   },
@@ -133,7 +135,6 @@ const handleReset = async () => {
 const isModalOpen = ref(false)
 const searchFormRef = useTemplateRef('searchFormRef')
 const { height: searchFormHeight } = useElementSize(searchFormRef)
-// TODO: 完成新增用户功能
 const formData = ref<AdminAddUserDtoInterface>({
   nickname: '',
   username: '',
@@ -222,6 +223,90 @@ const addUser = async () => {
   }
 }
 let handleSubmit = addUser
+
+const editUser = async () => {
+  try {
+    await formRef.value?.validate()
+    await UserApi.updateUser(id, formData.value)
+    message.success('编辑成功')
+    formData.value = {
+      nickname: '',
+      username: '',
+      password: '',
+      roleIds: [],
+    }
+    handleSearch()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    isAddUserLoading.value = false
+  }
+}
+
+let id = ''
+const handleClickEdit = async (
+  record: FindAllUsersApiResult['list'][number]
+) => {
+  console.log('edit', record)
+  // set form data
+  isModalOpen.value = true
+  id = record.id
+  formData.value = {
+    ...formData.value,
+    username: record.username,
+    nickname: record.nickname,
+    roleIds: record.roles.map(item => item.id),
+  }
+  handleSubmit = editUser
+}
+const testSelectAttrs = computed(() => {
+  return {
+    mode: 'multiple',
+    placeholder: '请选择',
+    options: rolesData.value,
+    loading: rolesLoading.value,
+    filterOption: false,
+    showSearch: true,
+    allowClear: true,
+    notFoundContent: rolesLoading ? '加载中...' : '暂无数据',
+  }
+})
+const testFormRenderList = ref([
+  {
+    key: 'username',
+    label: '账号',
+    name: 'username',
+    component: 'Input',
+    attrs: {
+      placeholder: '请输入',
+    },
+  },
+  {
+    key: 'nickname',
+    label: '昵称',
+    name: 'nickname',
+    component: 'Input',
+    attrs: {
+      placeholder: '请输入',
+    },
+  },
+  {
+    key: 'password',
+    label: '密码',
+    name: 'password',
+    component: 'Input',
+    attrs: {
+      placeholder: '请输入',
+    },
+  },
+  {
+    key: 'roles',
+    label: '角色',
+    name: 'roles',
+    component: 'Select',
+    attrs: testSelectAttrs,
+  },
+])
 </script>
 
 <template>
@@ -269,13 +354,24 @@ let handleSubmit = addUser
                 :not-found-content="rolesLoading ? '加载中...' : '暂无数据'"
                 mode="multiple"
                 placeholder="请选择"
-                @search="searchRoles($event)"
+                @search="searchRoles"
               >
               </a-select>
             </a-form-item>
           </a-col>
         </a-row>
       </a-form>
+      <Suspense>
+        <template #fallback>
+          <div>Loading model</div>
+        </template>
+        <AsyncFormRender
+          ref="formRef"
+          :model="formData"
+          :rules="formRules"
+          :items="testFormRenderList"
+        ></AsyncFormRender>
+      </Suspense>
     </a-modal>
 
     <!--- 搜索表单 --->
@@ -318,27 +414,17 @@ let handleSubmit = addUser
         </template>
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
-            <div class="flex items-center justify-between p-x-2px">
+            <div class="flex items-center justify-center p-x-2px">
               <a-button
                 type="primary"
                 @click="
-                  () => {
-                    console.log(record)
-                  }
+                  handleClickEdit(
+                    record as FindAllUsersApiResult['list'][number]
+                  )
                 "
               >
                 编辑</a-button
               >
-              <a-popconfirm
-                title="你确定吗？"
-                ok-text="确定"
-                cancel-text="取消"
-                @confirm=""
-              >
-                <a-button danger>{{
-                  record.status ? '禁用' : '启用'
-                }}</a-button>
-              </a-popconfirm>
             </div>
           </template>
         </template>
