@@ -11,6 +11,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RequireLogin, isPublic } from 'src/decorators/custom-decorator';
 import { Request as ExpressRequest } from 'express';
+import { AddUserDto } from './dto/add-user.dto';
 
 @RequireLogin()
 @Controller('users')
@@ -21,6 +22,11 @@ export class UsersController {
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
+  }
+
+  @Post('/add')
+  addUser(@Body() addUserDto: AddUserDto, @Request() req: ExpressRequest) {
+    return this.usersService.addUser(addUserDto, req);
   }
 
   /**

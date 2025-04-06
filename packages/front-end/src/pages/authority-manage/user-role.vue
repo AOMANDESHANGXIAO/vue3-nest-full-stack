@@ -24,6 +24,7 @@ import _ from 'lodash'
 import type { ColumnType } from 'ant-design-vue/es/table'
 import { useElementSize } from '@vueuse/core'
 import { commonDateFormatter } from '@/utils/time'
+import type { Rule } from 'ant-design-vue/es/form'
 
 defineOptions({
   name: 'role',
@@ -137,6 +138,30 @@ const formData = ref({
   password: '',
   roles: [],
 })
+const formRules: Record<string, Rule[]> = {
+  username: [
+    { required: true, message: '请输入账号', trigger: 'blur' },
+    { min: 3, max: 20, message: '账号长度在3到20个字符之间', trigger: 'blur' },
+  ],
+  nickname: [
+    { required: true, message: '请输入昵称', trigger: 'blur' },
+    { min: 2, max: 20, message: '昵称长度在2到20个字符之间', trigger: 'blur' },
+    {
+      pattern: /^[\u4e00-\u9fa5a-zA-Z0-9_\-\s·]+$/,
+      message: '昵称只能包含中文、字母、数字和下划线',
+      trigger: 'blur',
+    },
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, max: 15, message: '密码长度在6到20个字符之间', trigger: 'blur' },
+    {
+      pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,15}$/,
+      message: '密码必须包含至少一个大写字母、一个小写字母和一个数字',
+      trigger: 'blur',
+    },
+  ],
+}
 const handleClickAdd = () => {
   isModalOpen.value = true
 }
@@ -171,6 +196,10 @@ const rolesData = computed(() => {
     }
   })
 })
+const handleSubmit = () => {
+  console.log('submit')
+  console.log(formData.value)
+}
 </script>
 
 <template>
@@ -179,30 +208,35 @@ const rolesData = computed(() => {
       v-model:open="isModalOpen"
       ok-text="确定"
       cancel-text="取消"
-      @ok=""
+      @ok="handleSubmit"
     >
       <template #title>添加用户</template>
-      <a-form layout="horizontal" ref="formRef">
+      <a-form
+        layout="horizontal"
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+      >
         <a-row :gutter="10">
           <a-col :span="12">
-            <a-form-item label="账号" name="name">
+            <a-form-item label="账号" name="username">
               <a-input v-model:value="formData.username" placeholder="请输入" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="昵称" name="desc">
+            <a-form-item label="昵称" name="nickname">
               <a-input v-model:value="formData.nickname" placeholder="请输入" />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="10">
           <a-col :span="12">
-            <a-form-item label="密码" name="name">
+            <a-form-item label="密码" name="password">
               <a-input v-model:value="formData.password" placeholder="请输入" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="角色" name="desc">
+            <a-form-item label="角色" name="roles">
               <a-select
                 v-model:value="formData.roles"
                 :options="rolesData"

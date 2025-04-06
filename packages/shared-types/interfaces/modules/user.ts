@@ -3,7 +3,9 @@ export interface CreateUserDtoInterface {
   password: string
   nickname: string
 }
-
+export interface AdminAddUserDtoInterface extends CreateUserDtoInterface {
+  roleIds?: string[]
+}
 export interface FindOneUserApiResult {
   user: {
     id: string

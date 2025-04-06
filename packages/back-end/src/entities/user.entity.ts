@@ -37,6 +37,13 @@ export class User {
   })
   password: string;
 
+  @Column({
+    length: 50,
+    comment: '创建人',
+    nullable: true,
+  })
+  createBy: string;
+
   @CreateDateColumn()
   createTime: Date;
 

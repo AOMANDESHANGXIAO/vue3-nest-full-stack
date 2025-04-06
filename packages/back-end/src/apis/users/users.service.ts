@@ -1,6 +1,8 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
+import { Role } from 'src/entities/role.entity';
+import { In } from 'typeorm';
 import { type Repository } from 'typeorm';
 import { type CreateUserDto } from './dto/create-user.dto';
 import type {
@@ -8,18 +10,18 @@ import type {
   FindAllUsersApiResult,
 } from '@v3-nest-full-stack/shared-types';
 import * as bcrypt from 'bcrypt';
-import * as _ from 'lodash';
+// import * as _ from 'lodash';
 import { Request } from 'express';
+import { AddUserDto } from './dto/add-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Role) private roleRepository: Repository<Role>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<{
-    user: Omit<User, 'password'>;
-  }> {
+  async create(createUserDto: CreateUserDto): Promise<any> {
     // 检查账号是否已存在
     const existingUser = await this.userRepository.findOne({
       where: { username: createUserDto.username },
@@ -40,10 +42,44 @@ export class UsersService {
     });
 
     // 保存用户到数据库
-    const result = await this.userRepository.save(newUser);
+    await this.userRepository.save(newUser);
+    // 注册成功
+    return {};
+  }
+
+  async addUser(addUserDto: AddUserDto, req: Request) {
+    // 检查账号是否已存在
+    const existingUser = await this.userRepository.findOne({
+      where: { username: addUserDto.username },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('账号已存在');
+    }
+
+    // 对密码进行哈希处理
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(addUserDto.password, salt);
+    // 如果必要则查找角色
+    let roles: Role[] = [];
+    if (addUserDto.roleIds) {
+      roles = await this.roleRepository.findBy({
+        id: In(addUserDto.roleIds),
+      });
+    }
+    // 创建新用户
+    const newUser = this.userRepository.create({
+      username: addUserDto.username,
+      password: hashedPassword,
+      nickname: addUserDto.nickname,
+      roles,
+      createBy: req.user.uuid, // 假设用户信息存储在 req.user 中
+    });
+    // 保存用户到数据库
+    const user = await this.userRepository.save(newUser);
     // 注册成功
     return {
-      user: _.omit(result, ['password']),
+      user,
     };
   }
 
