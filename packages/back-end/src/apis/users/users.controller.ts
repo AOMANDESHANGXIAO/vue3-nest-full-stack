@@ -2,12 +2,16 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Param,
   Body,
   Request,
   Query,
   ParseIntPipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RequireLogin, isPublic } from 'src/decorators/custom-decorator';
 import { Request as ExpressRequest } from 'express';
@@ -45,5 +49,14 @@ export class UsersController {
     @Query('pageSize', ParseIntPipe) pageSize: number,
   ) {
     return this.usersService.findAll(current, pageSize);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Request() req: ExpressRequest,
+  ) {
+    return this.usersService.update(id, updateUserDto, req);
   }
 }

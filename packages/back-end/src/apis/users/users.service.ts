@@ -2,7 +2,7 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { Role } from 'src/entities/role.entity';
-import { In } from 'typeorm';
+import { In, Not } from 'typeorm';
 import { type Repository } from 'typeorm';
 import { type CreateUserDto } from './dto/create-user.dto';
 import type {
@@ -12,6 +12,7 @@ import type {
 import * as bcrypt from 'bcrypt';
 // import * as _ from 'lodash';
 import { Request } from 'express';
+import { type UpdateUserDto } from './dto/update-user.dto';
 import { AddUserDto } from './dto/add-user.dto';
 
 @Injectable()
@@ -122,6 +123,45 @@ export class UsersService {
       throw new Error('用户不存在');
     }
     user.status = false;
+    await this.userRepository.save(user);
+    return {};
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto, req: Request) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+    if (updateUserDto.username) {
+      // 检查账号是否已存在
+      const existingUser = await this.userRepository.findOne({
+        where: { username: updateUserDto.username, id: Not(id) },
+        // 排除当前用户
+        // where: { username: updateUserDto.username, id: Not(id) },
+      });
+
+      if (existingUser) {
+        throw new ConflictException('账号已存在');
+      }
+    }
+
+    // 如果密码被更新，则进行哈希处理
+    if (updateUserDto.password) {
+      const salt = await bcrypt.genSalt();
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+    }
+
+    // 如果用户角色被更新
+    if (updateUserDto.roleIds) {
+      const roles = await this.roleRepository.findBy({
+        id: In(updateUserDto.roleIds),
+      });
+      user.roles = roles;
+    }
+    Object.assign(user, updateUserDto);
+    user.updateBy = req.user.uuid;
     await this.userRepository.save(user);
     return {};
   }

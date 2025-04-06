@@ -44,6 +44,13 @@ export class User {
   })
   createBy: string;
 
+  @Column({
+    length: 50,
+    comment: '更新人',
+    nullable: true,
+  })
+  updateBy: string;
+
   @CreateDateColumn()
   createTime: Date;
 

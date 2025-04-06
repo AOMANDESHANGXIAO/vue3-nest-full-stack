@@ -335,7 +335,9 @@ let handleSubmit = addUser
                 cancel-text="取消"
                 @confirm=""
               >
-                <a-button danger>删除</a-button>
+                <a-button danger>{{
+                  record.status ? '禁用' : '启用'
+                }}</a-button>
               </a-popconfirm>
             </div>
           </template>
