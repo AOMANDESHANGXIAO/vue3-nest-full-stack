@@ -50,10 +50,10 @@ export class RolesController {
 
   @Get()
   async findAll(
-    @Query('size', ParseIntPipe) size: number,
-    @Query('page', ParseIntPipe) page: number,
+    @Query('pageSize', ParseIntPipe) pageSize: number,
+    @Query('current', ParseIntPipe) current: number,
     @Query('keyWord') keyWord: string,
   ) {
-    return this.rolesService.findAll(size, page, keyWord);
+    return this.rolesService.findAll(pageSize, current, keyWord);
   }
 }

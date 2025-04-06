@@ -16,8 +16,8 @@ export class RolesService {
   ) {}
 
   async findAll(
-    size: number,
-    page: number,
+    pageSize: number,
+    current: number,
     keyWord?: string,
   ): Promise<GetRoleListResult> {
     const queryBuilder = this.roleRepository
@@ -26,8 +26,8 @@ export class RolesService {
       .leftJoinAndSelect('role.updatedBy', 'updatedBy')
       .where('role.status = :status', { status: true })
       .orderBy('role.createTime', 'DESC')
-      .take(size)
-      .skip((page - 1) * size);
+      .take(pageSize)
+      .skip((current - 1) * pageSize);
 
     if (keyWord) {
       queryBuilder.andWhere('role.name LIKE :name', { name: `%${keyWord}%` });

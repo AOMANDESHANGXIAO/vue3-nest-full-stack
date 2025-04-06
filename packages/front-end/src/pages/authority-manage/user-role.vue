@@ -19,18 +19,10 @@ import {
   UndoOutlined,
   SearchOutlined,
 } from '@ant-design/icons-vue'
-import type {
-  CreateRoleInterface,
-  GetRoleListResult,
-  RoleOperatorRecord,
-} from '@v3-nest-full-stack/shared-types'
-import { type FormInstance, message } from 'ant-design-vue'
-import type { Rule } from 'ant-design-vue/es/form'
 import _ from 'lodash'
 import type { ColumnType } from 'ant-design-vue/es/table'
 import { useElementSize } from '@vueuse/core'
 import { commonDateFormatter } from '@/utils/time'
-import Table from '@/components/ant/Table.vue'
 
 defineOptions({
   name: 'role',
@@ -75,7 +67,7 @@ const columns: ColumnType[] = [
     title: '操作',
     dataIndex: 'action',
     key: 'action',
-    width: 150,
+    width: 170,
     align: 'center',
     fixed: 'right',
   },
@@ -128,7 +120,7 @@ const handleReset = async () => {
 const isModalOpen = ref(false)
 const contentContainerRef = useTemplateRef('contentContainerRef')
 const searchFormRef = useTemplateRef('searchFormRef')
-const { width, height } = useElementSize(contentContainerRef)
+const { height } = useElementSize(contentContainerRef)
 const { height: searchFormHeight } = useElementSize(searchFormRef)
 const aAtableScroll = computed(() => {
   return {
@@ -211,8 +203,17 @@ watch(
         </template>
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
-            <div class="flex items-center">
-              <a-button type="primary" class="mr-2"> 编辑</a-button>
+            <div class="flex items-center justify-between p-x-2px">
+              <a-button
+                type="primary"
+                @click="
+                  () => {
+                    console.log(record)
+                  }
+                "
+              >
+                编辑</a-button
+              >
               <a-popconfirm
                 title="你确定吗？"
                 ok-text="确定"

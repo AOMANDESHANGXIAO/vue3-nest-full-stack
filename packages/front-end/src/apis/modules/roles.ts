@@ -9,8 +9,9 @@ const baseUrl = '/roles'
 
 export class RolesApi {
   static async getRoles(params: {
-    page: number
-    size: number
+    current: number
+    pageSize: number
+    keyWord?: string
   }): Promise<GetRoleListResult> {
     return service({
       method: 'get',

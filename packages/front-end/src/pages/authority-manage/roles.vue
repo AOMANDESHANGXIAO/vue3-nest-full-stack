@@ -27,6 +27,7 @@ import { type FormInstance, message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form'
 import _ from 'lodash'
 import type { ColumnType } from 'ant-design-vue/es/table'
+import { useElementSize } from '@vueuse/core'
 import { commonDateFormatter } from '@/utils/time'
 
 defineOptions({
@@ -73,12 +74,27 @@ const columns: ColumnType[] = [
     align: 'center',
   },
 ]
-const defaultQueryParams = {
-  keyWord: '', // 角色名称
-  page: 1, // 当前页码
-  size: 5, // 每页显示条数
+const defaultQueryOptions = {
+  showSizeChanger: true,
+  showQuickJumper: true,
+  total: 0,
+  showTotal: (total: number) => `共 ${total} 条`,
+  pageSize: 5,
+  current: 1,
+  keyWord: '',
+  pageSizeOptions: ['5', '10', '20', '50'],
+  async onChange(current: number, pageSize: number) {
+    this.current = current
+    this.pageSize = pageSize
+    await nextTick()
+    handleSearch()
+  },
 }
-const queryParams = ref(_.cloneDeep(defaultQueryParams))
+const queryOptions = ref(_.cloneDeep(defaultQueryOptions))
+const queryParams = computed(() => {
+  return _.pick(queryOptions.value, ['keyWord', 'current', 'pageSize'])
+})
+// const queryParams = ref(_.cloneDeep(defaultQueryParams))
 const { state, isLoading, execute } = useAsyncState(
   RolesApi.getRoles,
   {
@@ -87,6 +103,9 @@ const { state, isLoading, execute } = useAsyncState(
   },
   {
     immediate: false,
+    onSuccess(data){
+      queryOptions.value.total = data.total
+    }
   }
 )
 onMounted(() => {
@@ -96,9 +115,10 @@ onMounted(() => {
 const handleSearch = () => {
   execute(0, queryParams.value)
 }
-const handleReset = () => {
-  queryParams.value = { ...defaultQueryParams }
-  handleSearch()
+const handleReset = async () => {
+ queryOptions.value = _.cloneDeep(defaultQueryOptions)
+ await nextTick()
+ handleSearch()
 }
 const isModalOpen = ref(false)
 const handleCreate = () => {
@@ -179,10 +199,19 @@ const handleDelete = (record: GetRoleListResult['list'][number]) => {
   id = record.id
   _delete()
 }
+const contentContainerRef = useTemplateRef('contentContainerRef')
+const { height } = useElementSize(contentContainerRef)
+const searchFormRef = useTemplateRef('searchFormRef')
+const { height: searchFormHeight } = useElementSize(searchFormRef)
+const aTableWrapperStyle = computed(() => {
+  return {
+    height: `${height.value - searchFormHeight.value}px - 30px`,
+  }
+})
 </script>
 
 <template>
-  <ContentContainer>
+  <ContentContainer ref="contentContainerRef">
     <a-modal
       v-model:open="isModalOpen"
       ok-text="确定"
@@ -213,9 +242,9 @@ const handleDelete = (record: GetRoleListResult['list'][number]) => {
     </a-modal>
 
     <!--- 搜索表单 --->
-    <a-form layout="inline" class="mb-4 relative">
+    <a-form ref="searchFormRef" layout="inline" class="mb-4 relative">
       <a-form-item label="角色名称">
-        <a-input v-model:value="queryParams.keyWord" placeholder="请输入" />
+        <a-input v-model:value="queryOptions.keyWord" placeholder="请输入" />
       </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="handleSearch">
@@ -236,45 +265,45 @@ const handleDelete = (record: GetRoleListResult['list'][number]) => {
     </a-form>
 
     <!--- 表格区域 --->
-    <a-table
-      :columns="columns"
-      :data-source="state.list"
-      :pagination="{
-        showSizeChanger: true,
-        showQuickJumper: true,
-        total: state.total,
-        showTotal: (total: number) => `共 ${total} 条`,
-      }"
-      :loading="isLoading"
-      bordered
-    >
-      <template #headerCell="{ column }">
-        <span class="font-bold">{{ column.title }}</span>
-      </template>
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.dataIndex === 'action'">
-          <div class="flex items-center">
-            <a-button
-              type="primary"
-              class="mr-2"
-              @click="handleEdit(record as GetRoleListResult['list'][number])"
-            >
-              编辑</a-button
-            >
-            <a-popconfirm
-              title="你确定要删除吗？"
-              ok-text="确定"
-              cancel-text="取消"
-              @confirm="
-                handleDelete(record as GetRoleListResult['list'][number])
-              "
-            >
-              <a-button danger :loading="isDeleteLoading">删除</a-button>
-            </a-popconfirm>
-          </div>
+    <section class="w-full" :style="aTableWrapperStyle">
+      <a-table
+        :columns="columns"
+        :data-source="state.list"
+        :scroll="{
+          x: '100%',
+          y: 'max-content',
+        }"
+        v-model:pagination="queryOptions"
+        :loading="isLoading"
+      >
+        <template #headerCell="{ column }">
+          <span class="font-bold">{{ column.title }}</span>
         </template>
-      </template>
-    </a-table>
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.dataIndex === 'action'">
+            <div class="flex items-center">
+              <a-button
+                type="primary"
+                class="mr-2"
+                @click="handleEdit(record as GetRoleListResult['list'][number])"
+              >
+                编辑</a-button
+              >
+              <a-popconfirm
+                title="你确定要删除吗？"
+                ok-text="确定"
+                cancel-text="取消"
+                @confirm="
+                  handleDelete(record as GetRoleListResult['list'][number])
+                "
+              >
+                <a-button danger :loading="isDeleteLoading">删除</a-button>
+              </a-popconfirm>
+            </div>
+          </template>
+        </template>
+      </a-table>
+    </section>
   </ContentContainer>
 </template>
 

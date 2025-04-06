@@ -27,6 +27,9 @@
       > .ant-table-body {
         flex: 1;
         height: 0;
+        &::-webkit-scrollbar-track {
+          background: transparent;
+        }
       }
     }
   }
