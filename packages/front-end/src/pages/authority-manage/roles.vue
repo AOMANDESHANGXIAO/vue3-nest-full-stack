@@ -199,19 +199,17 @@ const handleDelete = (record: GetRoleListResult['list'][number]) => {
   id = record.id
   _delete()
 }
-const contentContainerRef = useTemplateRef('contentContainerRef')
-const { height } = useElementSize(contentContainerRef)
 const searchFormRef = useTemplateRef('searchFormRef')
 const { height: searchFormHeight } = useElementSize(searchFormRef)
 const aTableWrapperStyle = computed(() => {
   return {
-    height: `${height.value - searchFormHeight.value}px - 30px`,
+    height: `100% - ${searchFormHeight.value}px - 30px`,
   }
 })
 </script>
 
 <template>
-  <ContentContainer ref="contentContainerRef">
+  <ContentContainer>
     <a-modal
       v-model:open="isModalOpen"
       ok-text="确定"

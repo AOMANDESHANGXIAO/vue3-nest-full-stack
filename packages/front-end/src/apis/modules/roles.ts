@@ -1,7 +1,8 @@
 import service from '@/apis'
-import {
-  type GetRoleListResult,
-  type CreateRoleInterface,
+import type {
+   GetRoleListResult,
+   CreateRoleInterface,
+   GetAllRolesResult,
 } from '@v3-nest-full-stack/shared-types'
 import { type UpdateRoleInterface } from '@v3-nest-full-stack/shared-types'
 
@@ -19,6 +20,16 @@ export class RolesApi {
       params,
     })
   }
+  static async getAllRoles(params?: {
+    keyWord?: string
+  }): Promise<GetAllRolesResult> {
+    return service({
+      method: 'get',
+      url: `${baseUrl}/all`,
+      params,
+    })
+  }
+
   static async createRole(data: CreateRoleInterface) {
     return service({
       method: 'post',

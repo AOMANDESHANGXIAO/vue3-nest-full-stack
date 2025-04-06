@@ -13,6 +13,7 @@
 <script lang="ts" setup>
 import ContentContainer from '@/components/layouts/content-container.vue'
 import { UserApi } from '@/apis/modules/user'
+import { RolesApi } from '@/apis/modules/roles'
 import { useAsyncState } from '@vueuse/core'
 import {
   PlusOutlined,
@@ -39,6 +40,15 @@ const columns: ColumnType[] = [
     dataIndex: 'nickname',
     key: 'nickname',
     align: 'center',
+  },
+  {
+    title: '角色',
+    dataIndex: 'roles',
+    key: 'roles',
+    align: 'center',
+    customRender: ({ record }: { record: any }) => {
+      return record.roles.map((item: any) => item.name).join(',') || '普通用户'
+    },
   },
   {
     title: '创建时间',
@@ -118,49 +128,98 @@ const handleReset = async () => {
   handleSearch()
 }
 const isModalOpen = ref(false)
-const contentContainerRef = useTemplateRef('contentContainerRef')
 const searchFormRef = useTemplateRef('searchFormRef')
-const { height } = useElementSize(contentContainerRef)
 const { height: searchFormHeight } = useElementSize(searchFormRef)
-const aAtableScroll = computed(() => {
-  return {
-    y: height.value - searchFormHeight.value,
-  }
+// TODO: 完成新增用户功能
+const formData = ref({
+  nickname: '',
+  username: '',
+  password: '',
+  roles: [],
 })
-watch(
-  () => aAtableScroll.value,
-  val => {
-    console.log(val)
+const handleClickAdd = () => {
+  isModalOpen.value = true
+}
+const {
+  state: rolesState,
+  isLoading: rolesLoading,
+  execute: rolesExecute,
+} = useAsyncState(
+  RolesApi.getAllRoles,
+  {
+    list: [],
+  },
+  {
+    onSuccess(data) {
+      console.log('get all roles', data)
+    },
+    immediate: true,
   }
 )
+const searchRoles = _.debounce(async (value: string) => {
+  if (value) {
+    await rolesExecute(0, { keyWord: value })
+  } else {
+    await rolesExecute(0, {})
+  }
+}, 500)
+const rolesData = computed(() => {
+  return rolesState.value.list.map((item: { id: string; name: string }) => {
+    return {
+      label: item.name,
+      value: item.id,
+    }
+  })
+})
 </script>
 
 <template>
-  <ContentContainer ref="contentContainerRef">
+  <ContentContainer>
     <a-modal
       v-model:open="isModalOpen"
       ok-text="确定"
       cancel-text="取消"
       @ok=""
     >
-      <template #title>新增角色</template>
-      <!-- <a-form
-        layout="horizontal"
-        ref="formRef"
-      >
+      <template #title>添加用户</template>
+      <a-form layout="horizontal" ref="formRef">
         <a-row :gutter="10">
           <a-col :span="12">
-            <a-form-item label="角色名称" name="name">
-              <a-input v-model:value="formData.name" placeholder="请输入" />
+            <a-form-item label="账号" name="name">
+              <a-input v-model:value="formData.username" placeholder="请输入" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="描述" name="desc">
-              <a-textarea v-model:value="formData.desc" placeholder="请输入" />
+            <a-form-item label="昵称" name="desc">
+              <a-input v-model:value="formData.nickname" placeholder="请输入" />
             </a-form-item>
           </a-col>
         </a-row>
-      </a-form> -->
+        <a-row :gutter="10">
+          <a-col :span="12">
+            <a-form-item label="密码" name="name">
+              <a-input v-model:value="formData.password" placeholder="请输入" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="角色" name="desc">
+              <a-select
+                v-model:value="formData.roles"
+                :options="rolesData"
+                :loading="rolesLoading"
+                :filter-option="false"
+                :show-search="true"
+                :allow-clear="true"
+                :not-found-content="rolesLoading ? '加载中...' : '暂无数据'"
+                mode="multiple"
+                placeholder="请选择"
+                @search="searchRoles($event)"
+              >
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
     </a-modal>
 
     <!--- 搜索表单 --->
@@ -179,7 +238,7 @@ watch(
         </a-button>
       </a-form-item>
       <a-form-item class="absolute right-0">
-        <a-button type="primary" class="ml-2" @click="">
+        <a-button type="primary" class="ml-2" @click="handleClickAdd">
           <PlusOutlined />
           <span>新增</span>
         </a-button>

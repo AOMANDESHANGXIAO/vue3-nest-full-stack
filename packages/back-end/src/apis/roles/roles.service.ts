@@ -6,7 +6,10 @@ import { Repository } from 'typeorm';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Request } from 'express';
-import { GetRoleListResult } from '@v3-nest-full-stack/shared-types';
+import type {
+  GetRoleListResult,
+  GetAllRolesResult,
+} from '@v3-nest-full-stack/shared-types';
 
 @Injectable()
 export class RolesService {
@@ -15,7 +18,23 @@ export class RolesService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll(
+  async findAll(keyWord?: string): Promise<GetAllRolesResult> {
+    const queryBuilder = this.roleRepository
+      .createQueryBuilder('role')
+      .leftJoinAndSelect('role.createdBy', 'createdBy')
+      .leftJoinAndSelect('role.updatedBy', 'updatedBy')
+      .where('role.status = :status', { status: true })
+      .orderBy('role.createTime', 'DESC');
+
+    if (keyWord) {
+      queryBuilder.andWhere('role.name LIKE :name', { name: `%${keyWord}%` });
+    }
+
+    const roles = await queryBuilder.getMany();
+    return { list: roles };
+  }
+
+  async findByPage(
     pageSize: number,
     current: number,
     keyWord?: string,

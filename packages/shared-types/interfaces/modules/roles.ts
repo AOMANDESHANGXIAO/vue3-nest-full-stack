@@ -24,3 +24,15 @@ export interface GetRoleListResult {
   }[]
   total: number
 }
+export interface GetAllRolesResult {
+  list: {
+    id: string
+    name: string
+    desc: string
+    status: boolean
+    createTime: Date
+    updateTime: Date
+    createdBy: RoleOperatorRecord
+    updatedBy: RoleOperatorRecord
+  }[]
+}
