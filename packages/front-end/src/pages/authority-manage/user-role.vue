@@ -15,6 +15,8 @@ import ContentContainer from '@/components/layouts/content-container.vue'
 import { UserApi } from '@/apis/modules/user'
 import { RolesApi } from '@/apis/modules/roles'
 import { useAsyncState } from '@vueuse/core'
+import type { AdminAddUserDtoInterface } from '@v3-nest-full-stack/shared-types'
+import { message } from 'ant-design-vue'
 import {
   PlusOutlined,
   UndoOutlined,
@@ -24,7 +26,7 @@ import _ from 'lodash'
 import type { ColumnType } from 'ant-design-vue/es/table'
 import { useElementSize } from '@vueuse/core'
 import { commonDateFormatter } from '@/utils/time'
-import type { Rule } from 'ant-design-vue/es/form'
+import type { FormInstance, Rule } from 'ant-design-vue/es/form'
 
 defineOptions({
   name: 'role',
@@ -132,11 +134,11 @@ const isModalOpen = ref(false)
 const searchFormRef = useTemplateRef('searchFormRef')
 const { height: searchFormHeight } = useElementSize(searchFormRef)
 // TODO: 完成新增用户功能
-const formData = ref({
+const formData = ref<AdminAddUserDtoInterface>({
   nickname: '',
   username: '',
   password: '',
-  roles: [],
+  roleIds: [],
 })
 const formRules: Record<string, Rule[]> = {
   username: [
@@ -163,6 +165,7 @@ const formRules: Record<string, Rule[]> = {
   ],
 }
 const handleClickAdd = () => {
+  handleSubmit = addUser
   isModalOpen.value = true
 }
 const {
@@ -196,10 +199,29 @@ const rolesData = computed(() => {
     }
   })
 })
-const handleSubmit = () => {
-  console.log('submit')
-  console.log(formData.value)
+const isAddUserLoading = ref(false)
+const formRef = useTemplateRef<FormInstance>('formRef')
+const addUser = async () => {
+  try {
+    isModalOpen.value = true
+    await formRef.value?.validate()
+    await UserApi.addUser(formData.value)
+    message.success('添加成功')
+    formData.value = {
+      nickname: '',
+      username: '',
+      password: '',
+      roleIds: [],
+    }
+    handleSearch()
+    isModalOpen.value = false
+  } catch (error) {
+    console.error(error)
+  } finally {
+    isAddUserLoading.value = false
+  }
 }
+let handleSubmit = addUser
 </script>
 
 <template>
@@ -238,7 +260,7 @@ const handleSubmit = () => {
           <a-col :span="12">
             <a-form-item label="角色" name="roles">
               <a-select
-                v-model:value="formData.roles"
+                v-model:value="formData.roleIds"
                 :options="rolesData"
                 :loading="rolesLoading"
                 :filter-option="false"

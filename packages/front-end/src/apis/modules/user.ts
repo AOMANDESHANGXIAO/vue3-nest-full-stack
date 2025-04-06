@@ -1,6 +1,7 @@
 import service from '@/apis'
 import type {
   CreateUserDtoInterface,
+  AdminAddUserDtoInterface,
   FindOneUserApiResult,
   FindAllUsersApiResult,
 } from '@v3-nest-full-stack/shared-types'
@@ -29,6 +30,13 @@ export class UserApi {
       method: 'get',
       url: `${baseUrl}/all`,
       params,
+    })
+  }
+  static async addUser(data: AdminAddUserDtoInterface): Promise<any> {
+    return service({
+      method: 'post',
+      url: `${baseUrl}/add`,
+      data,
     })
   }
 }
