@@ -135,13 +135,14 @@ const handleReset = async () => {
 const isModalOpen = ref(false)
 const searchFormRef = useTemplateRef('searchFormRef')
 const { height: searchFormHeight } = useElementSize(searchFormRef)
-const formData = ref<AdminAddUserDtoInterface>({
+const formStatus = ref('add')
+const addUserformData = ref<AdminAddUserDtoInterface>({
   nickname: '',
   username: '',
   password: '',
   roleIds: [],
 })
-const formRules: Record<string, Rule[]> = {
+const addUserformRules: Record<string, Rule[]> = {
   username: [
     { required: true, message: '请输入账号', trigger: 'blur' },
     { min: 3, max: 20, message: '账号长度在3到20个字符之间', trigger: 'blur' },
@@ -167,7 +168,10 @@ const formRules: Record<string, Rule[]> = {
 }
 const handleClickAdd = () => {
   handleSubmit = addUser
+  formStatus.value = 'add'
   isModalOpen.value = true
+  console.log('addUserformData', addUserformData.value)
+  console.log('addUserItems', addUserFormItems.value)
 }
 const {
   state: rolesState,
@@ -206,9 +210,9 @@ const addUser = async () => {
   try {
     isModalOpen.value = true
     await formRef.value?.validate()
-    await UserApi.addUser(formData.value)
+    await UserApi.addUser(addUserformData.value)
     message.success('添加成功')
-    formData.value = {
+    addUserformData.value = {
       nickname: '',
       username: '',
       password: '',
@@ -223,55 +227,7 @@ const addUser = async () => {
   }
 }
 let handleSubmit = addUser
-
-const editUser = async () => {
-  try {
-    await formRef.value?.validate()
-    await UserApi.updateUser(id, formData.value)
-    message.success('编辑成功')
-    formData.value = {
-      nickname: '',
-      username: '',
-      password: '',
-      roleIds: [],
-    }
-    handleSearch()
-  } catch (error) {
-    console.error(error)
-  } finally {
-    isAddUserLoading.value = false
-  }
-}
-
-let id = ''
-const handleClickEdit = async (
-  record: FindAllUsersApiResult['list'][number]
-) => {
-  console.log('edit', record)
-  // set form data
-  isModalOpen.value = true
-  id = record.id
-  formData.value = {
-    ...formData.value,
-    username: record.username,
-    nickname: record.nickname,
-    roleIds: record.roles.map(item => item.id),
-  }
-  handleSubmit = editUser
-}
-const testSelectAttrs = computed(() => {
-  return {
-    mode: 'multiple',
-    placeholder: '请选择',
-    options: rolesData.value,
-    loading: rolesLoading.value,
-    filterOption: false,
-    showSearch: true,
-    allowClear: true,
-    notFoundContent: rolesLoading ? '加载中...' : '暂无数据',
-  }
-})
-const testFormRenderList = ref([
+const addUserFormItems = ref([
   {
     key: 'username',
     label: '账号',
@@ -304,9 +260,124 @@ const testFormRenderList = ref([
     label: '角色',
     name: 'roles',
     component: 'Select',
-    attrs: testSelectAttrs,
+    attrs: () => {
+      return {
+        mode: 'multiple',
+        placeholder: '请选择',
+        options: rolesData.value,
+        loading: rolesLoading.value,
+        filterOption: false,
+        showSearch: true,
+        allowClear: true,
+        notFoundContent: rolesLoading ? '加载中...' : '暂无数据',
+        onSearch: (value: string) => {
+          searchRoles(value)
+        },
+      }
+    },
   },
 ])
+
+const editUserFormData = ref<AdminAddUserDtoInterface>({
+  nickname: '',
+  username: '',
+  password: '',
+  roleIds: [],
+})
+const editUserformRules: Record<string, Rule[]> = {
+  username: [
+    { required: true, message: '请输入账号', trigger: 'blur' },
+    { min: 3, max: 20, message: '账号长度在3到20个字符之间', trigger: 'blur' },
+  ],
+  nickname: [
+    { required: true, message: '请输入昵称', trigger: 'blur' },
+    { min: 2, max: 20, message: '昵称长度在2到20个字符之间', trigger: 'blur' },
+    {
+      pattern: /^[\u4e00-\u9fa5a-zA-Z0-9_\-\s·]+$/,
+      message: '昵称只能包含中文、字母、数字和下划线',
+      trigger: 'blur',
+    },
+  ],
+}
+const editFormItems = ref([
+  {
+    key: 'username',
+    label: '账号',
+    name: 'username',
+    component: 'Input',
+    attrs: {
+      placeholder: '请输入',
+      disabled: true,
+    },
+  },
+  {
+    key: 'nickname',
+    label: '昵称',
+    name: 'nickname',
+    component: 'Input',
+    attrs: {
+      placeholder: '请输入',
+    },
+  },
+  {
+    key: 'roles',
+    label: '角色',
+    name: 'roles',
+    component: 'Select',
+    attrs: () => {
+      return {
+        mode: 'multiple',
+        placeholder: '请选择',
+        options: rolesData.value,
+        loading: rolesLoading.value,
+        defaultValue: editUserFormData.value.roleIds,
+        key: editUserFormData.value.roleIds,
+        filterOption: false,
+        showSearch: true,
+        allowClear: true,
+        notFoundContent: rolesLoading ? '加载中...' : '暂无数据',
+        onSearch: (value: string) => {
+          searchRoles(value)
+        },
+      }
+    },
+  },
+])
+const editUser = async () => {
+  try {
+    await formRef.value?.validate()
+    await UserApi.updateUser(id, editUserFormData.value)
+    message.success('编辑成功')
+    editUserFormData.value = {
+      nickname: '',
+      username: '',
+      password: '',
+      roleIds: [],
+    }
+    handleSearch()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    isAddUserLoading.value = false
+  }
+}
+
+let id = ''
+const handleClickEdit = async (
+  record: FindAllUsersApiResult['list'][number]
+) => {
+  console.log('edit', record)
+  isModalOpen.value = true
+  id = record.id
+  formStatus.value = 'edit'
+  editUserFormData.value = {
+    ...editUserFormData.value,
+    username: record.username,
+    nickname: record.nickname,
+    roleIds: record.roles.map(item => item.id),
+  }
+  handleSubmit = editUser
+}
 </script>
 
 <template>
@@ -317,60 +388,22 @@ const testFormRenderList = ref([
       cancel-text="取消"
       @ok="handleSubmit"
     >
-      <template #title>添加用户</template>
-      <a-form
-        layout="horizontal"
-        ref="formRef"
-        :model="formData"
-        :rules="formRules"
-      >
-        <a-row :gutter="10">
-          <a-col :span="12">
-            <a-form-item label="账号" name="username">
-              <a-input v-model:value="formData.username" placeholder="请输入" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="昵称" name="nickname">
-              <a-input v-model:value="formData.nickname" placeholder="请输入" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="10">
-          <a-col :span="12">
-            <a-form-item label="密码" name="password">
-              <a-input v-model:value="formData.password" placeholder="请输入" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="角色" name="roles">
-              <a-select
-                v-model:value="formData.roleIds"
-                :options="rolesData"
-                :loading="rolesLoading"
-                :filter-option="false"
-                :show-search="true"
-                :allow-clear="true"
-                :not-found-content="rolesLoading ? '加载中...' : '暂无数据'"
-                mode="multiple"
-                placeholder="请选择"
-                @search="searchRoles"
-              >
-              </a-select>
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-form>
+      <template #title>{{
+        formStatus === 'add' ? '新增用户' : '编辑用户'
+      }}</template>
       <Suspense>
         <template #fallback>
           <div>Loading model</div>
         </template>
-        <AsyncFormRender
-          ref="formRef"
-          :model="formData"
-          :rules="formRules"
-          :items="testFormRenderList"
-        ></AsyncFormRender>
+        <template #default>
+          <AsyncFormRender
+            v-if="isModalOpen"
+            ref="formRef"
+            :model="formStatus === 'add' ? addUserformData : editUserFormData"
+            :rules="formStatus === 'add' ? addUserformRules : editUserformRules"
+            :items="formStatus === 'add' ? addUserFormItems : editFormItems"
+          ></AsyncFormRender>
+        </template>
       </Suspense>
     </a-modal>
 

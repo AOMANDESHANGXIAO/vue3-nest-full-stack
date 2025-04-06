@@ -2,14 +2,16 @@
  包括字段的key、label、name、component和attrs等属性。
  需要注意的是，该组件为一个异步组件，所以你需要结合Suspence组件来使用。
  可以参考Vue官网: https://cn.vuejs.org/guide/built-ins/suspense.html
+ 设计为异步组件的原因是为了提高性能，避免将没有使用的ant-design组件一起打包。
  -->
 <script setup lang="ts">
 import type { Rule } from 'ant-design-vue/es/form'
+import _ from 'lodash'
 
 defineOptions({
   name: 'FormRender',
 })
-export interface FormRenderProps {
+interface FormRenderProps {
   model: {
     [key: string]: any
   }
@@ -21,9 +23,12 @@ export interface FormRenderProps {
     label: string
     name: string
     component: string
-    attrs?: {
-      [key: string]: any
-    }
+    isRender?: boolean
+    attrs?:
+      | {
+          [key: string]: any
+        }
+      | Function
     [key: string]: any
   }[]
 }
@@ -54,17 +59,37 @@ const doLoadAllComponents = async () => {
 }
 await doLoadAllComponents()
 
-function combinePairs<T>(arr: T[]): [T, T][] {
-  const result: [T, T][] = []
-
-  for (let i = 0; i < arr.length; i += 2) {
-    if (i + 1 < arr.length) {
+function combinePairs(arr: any[]) {
+  const result = []
+  const flags: boolean[] = []
+  for (let i = 0; i < arr.length; i++) {
+    flags[i] = false
+  }
+  for (let i = 0; i < arr.length; i++) {
+    if (flags[i]) {
+      continue
+    }
+    if (i + 1 > arr.length - 1) {
+      result.push([arr[i]])
+      flags[i] = true
+    } else if (i + 1 <= arr.length - 1) {
       result.push([arr[i], arr[i + 1]])
+      flags[i] = true
+      flags[i + 1] = true
     }
   }
-
   return result
 }
+for (const item of props.items) {
+  if (_.isFunction(item.attrs)) {
+    console.log('attrs is function', item.attrs())
+  } else {
+    console.log('attrs is object', item.attrs)
+  }
+}
+onMounted(() => {
+  console.log('loadedComponents', loadedComponents.value)
+})
 </script>
 
 <template>
@@ -77,10 +102,9 @@ function combinePairs<T>(arr: T[]): [T, T][] {
         <a-col :span="12" v-for="item in pair" :key="item.name">
           <a-form-item :label="item.label" :name="item.name">
             <component
-              v-if="loadedComponents[item.component]"
               :is="loadedComponents[item.component]"
               v-model:value="model[item.name]"
-              v-bind="item.attrs"
+              v-bind="_.isFunction(item.attrs) ? item.attrs() : item.attrs"
             ></component>
           </a-form-item>
         </a-col>
