@@ -80,11 +80,6 @@ function combinePairs(arr: any[]) {
   }
   return result;
 }
-for (const item of props.items) {
-  if (_.isFunction(item.attrs)) {
-    console.log(item.attrs());
-  }
-}
 </script>
 
 <template>

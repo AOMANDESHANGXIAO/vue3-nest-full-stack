@@ -14,8 +14,11 @@
 import ContentContainer from "@/components/layouts/content-container.vue";
 import { UserApi } from "@/apis/modules/user";
 import { RolesApi } from "@/apis/modules/roles";
-import { useAsyncState } from "@vueuse/core";
-import type { AdminAddUserDtoInterface } from "@v3-nest-full-stack/shared-types";
+import { useAsyncState, useResizeObserver } from "@vueuse/core";
+import type {
+  AdminAddUserDtoInterface,
+  UpdateUserDtoInterface,
+} from "@v3-nest-full-stack/shared-types";
 import { message } from "ant-design-vue";
 import {
   PlusOutlined,
@@ -278,11 +281,12 @@ const addUserFormItems = ref([
   },
 ]);
 
-const editUserFormData = ref<AdminAddUserDtoInterface>({
+const editUserFormData = ref<UpdateUserDtoInterface>({
   nickname: "",
   username: "",
   password: "",
   roleIds: [],
+  status: true,
 });
 const editUserformRules: Record<string, Rule[]> = {
   username: [
@@ -342,6 +346,28 @@ const editFormItems = ref([
       };
     },
   },
+  {
+    key: "status",
+    label: "状态",
+    name: "status",
+    component: "Select",
+    attrs: () => {
+      return {
+        placeholder: "请选择",
+        options: [
+          {
+            label: "启用",
+            value: true,
+          },
+          {
+            label: "禁用",
+            value: false,
+          },
+        ],
+        defaultValue: true,
+      };
+    },
+  },
 ]);
 const editUser = async () => {
   try {
@@ -353,6 +379,7 @@ const editUser = async () => {
       username: "",
       password: "",
       roleIds: [],
+      status: true,
     };
     handleSearch();
   } catch (error) {
@@ -366,7 +393,6 @@ let id = "";
 const handleClickEdit = async (
   record: FindAllUsersApiResult["list"][number]
 ) => {
-  console.log("edit", record);
   isModalOpen.value = true;
   id = record.id;
   formStatus.value = "edit";
@@ -375,15 +401,12 @@ const handleClickEdit = async (
     username: record.username,
     nickname: record.nickname,
     roleIds: record.roles.map((item) => item.id),
+    status: record.status,
   };
   console.log("editUserFormData", editUserFormData.value);
   handleSubmit = editUser;
 };
-const t = async () => {
-  if(!editUserFormData.value.roleIds){return}
-  editUserFormData.value.roleIds = [...editUserFormData.value.roleIds];
-  await nextTick();
-};
+// TODO: 1. 当页面大小发生变化时应该重新绘制ant-table
 </script>
 
 <template>
@@ -404,7 +427,6 @@ const t = async () => {
         <template #default>
           <AsyncFormRender
             v-if="isModalOpen"
-            @vue:mounted="t"
             ref="formRef"
             :model="formStatus === 'add' ? addUserformData : editUserFormData"
             :rules="formStatus === 'add' ? addUserformRules : editUserformRules"
