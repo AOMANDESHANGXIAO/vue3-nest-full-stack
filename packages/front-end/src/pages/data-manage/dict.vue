@@ -19,6 +19,7 @@ import { DictsApi } from '@/apis/modules/dicts'
 import _ from 'lodash'
 import { useElementSize } from '@vueuse/core'
 import { SearchOutlined, UndoOutlined } from '@ant-design/icons-vue'
+import { useDictStore } from '@/stores/modules/use-dict-store'
 
 defineOptions({
   name: 'dict',
@@ -58,6 +59,8 @@ const handleSearch = () => {
 onMounted(() => {
   handleSearch()
 })
+const { getDict } = useDictStore()
+
 const columns: ColumnType<any>[] = [
   {
     title: '编码',
@@ -175,6 +178,11 @@ onMounted(() => {
         :loading="isLoading"
         :scroll="{ x: '100%', y: 'max-content' }"
       >
+        <template #bodyCell="{ column, record }">
+          <div v-if="column.dataIndex === 'status'">
+            {{ getDict('status', record.status) }}
+          </div>
+        </template>
       </a-table>
     </div>
   </ContentContainer>

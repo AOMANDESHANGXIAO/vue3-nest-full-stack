@@ -94,9 +94,7 @@ export class DictsService {
     if (!detail) {
       throw new Error('字典详情不存在');
     }
-    return {
-      text: detail.name,
-    };
+    return detail.name;
   }
 
   update(id: number, updateDictDto: UpdateDictDto) {
