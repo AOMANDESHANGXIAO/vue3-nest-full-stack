@@ -7,7 +7,10 @@ import { Dict } from 'src/entities/dict.entity';
 import { DictDetail } from 'src/entities/dict_detail.entity';
 import { Repository } from 'typeorm';
 import { Request } from 'express';
-import { DictListResult } from '@v3-nest-full-stack/shared-types';
+import type {
+  DictListResult,
+  FindOneDictResult,
+} from '@v3-nest-full-stack/shared-types';
 
 @Injectable()
 export class DictsService {
@@ -68,7 +71,7 @@ export class DictsService {
     };
   }
 
-  async findOne(code: string) {
+  async findOne(code: string): Promise<FindOneDictResult> {
     const dict = await this.dictRepository.findOne({
       where: { code, status: 1 },
       relations: ['details'],
@@ -76,6 +79,23 @@ export class DictsService {
     // formatter 格式化数据, 转换为list结构, 方便前端使用
     return {
       list: this.dictFormatter(dict),
+    };
+  }
+
+  async getTransferText(code: string, dictCode: string) {
+    const dict = await this.dictRepository.findOne({
+      where: { code, status: 1 },
+      relations: ['details'],
+    });
+    if (!dict) {
+      throw new Error('字典不存在');
+    }
+    const detail = dict.details.find((item) => item.code === dictCode);
+    if (!detail) {
+      throw new Error('字典详情不存在');
+    }
+    return {
+      text: detail.name,
     };
   }
 

@@ -2,6 +2,7 @@ import service from "@/apis";
 import type {
   DictListResult,
   GetListCommonParams,
+  FindOneDictResult,
 } from "@v3-nest-full-stack/shared-types";
 
 const baseUrl = "/dicts";
@@ -12,5 +13,12 @@ export class DictsApi {
       url: `${baseUrl}`,
       params,
     });
+  }
+
+  static async getDict(code: string): Promise<FindOneDictResult> {
+    return service({
+      method: "get",
+      url: `${baseUrl}/${code}`,  
+    })
   }
 }

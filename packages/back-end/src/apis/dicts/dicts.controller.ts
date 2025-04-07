@@ -16,7 +16,6 @@ import { CreateDictDto } from './dto/create-dict.dto';
 import { UpdateDictDto } from './dto/update-dict.dto';
 import { RequireLogin } from 'src/decorators/custom-decorator';
 
-
 @RequireLogin()
 @Controller('dicts')
 export class DictsController {
@@ -38,6 +37,14 @@ export class DictsController {
   @Get(':code')
   findOne(@Param('code') code: string) {
     return this.dictsService.findOne(code);
+  }
+
+  @Get('transfer/code')
+  getTransfer(
+    @Query('code') code: string,
+    @Query('dictCode') dictCode: string,
+  ) {
+    return this.dictsService.getTransferText(code, dictCode);
   }
 
   @Patch(':id')
