@@ -25,6 +25,8 @@ declare module 'vue-router/auto-routes' {
     '/authority-manage': RouteRecordInfo<'/authority-manage', '/authority-manage', Record<never, never>, Record<never, never>>,
     '/authority-manage/roles': RouteRecordInfo<'/authority-manage/roles', '/authority-manage/roles', Record<never, never>, Record<never, never>>,
     '/authority-manage/user-role': RouteRecordInfo<'/authority-manage/user-role', '/authority-manage/user-role', Record<never, never>, Record<never, never>>,
+    '/data-manage': RouteRecordInfo<'/data-manage', '/data-manage', Record<never, never>, Record<never, never>>,
+    '/data-manage/dict': RouteRecordInfo<'/data-manage/dict', '/data-manage/dict', Record<never, never>, Record<never, never>>,
     '/home': RouteRecordInfo<'/home', '/home', Record<never, never>, Record<never, never>>,
     '/setting': RouteRecordInfo<'/setting', '/setting', Record<never, never>, Record<never, never>>,
   }

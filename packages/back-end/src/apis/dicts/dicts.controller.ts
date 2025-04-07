@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   Request,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
 import { DictsService } from './dicts.service';
 import { CreateDictDto } from './dto/create-dict.dto';
 import { UpdateDictDto } from './dto/update-dict.dto';
 import { RequireLogin } from 'src/decorators/custom-decorator';
+
 
 @RequireLogin()
 @Controller('dicts')
@@ -25,8 +28,11 @@ export class DictsController {
   }
 
   @Get()
-  findAll() {
-    return this.dictsService.findAll();
+  findAll(
+    @Query('current', ParseIntPipe) current: number,
+    @Query('pageSize', ParseIntPipe) pageSize: number,
+  ) {
+    return this.dictsService.findAll(current, pageSize);
   }
 
   @Get(':code')

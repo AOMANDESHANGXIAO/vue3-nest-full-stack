@@ -7,7 +7,7 @@ import { Dict } from 'src/entities/dict.entity';
 import { DictDetail } from 'src/entities/dict_detail.entity';
 import { Repository } from 'typeorm';
 import { Request } from 'express';
-
+import { DictListResult } from '@v3-nest-full-stack/shared-types';
 
 @Injectable()
 export class DictsService {
@@ -15,6 +15,17 @@ export class DictsService {
   @InjectRepository(DictDetail)
   private readonly dictDetailRepository: Repository<DictDetail>;
   @Inject(UsersService) private readonly usersService: UsersService;
+
+  private dictFormatter(dict: Dict) {
+    return dict.details.map((item) => {
+      return {
+        id: item.id,
+        label: item.name,
+        value: item.code,
+      };
+    });
+  }
+
   async create(createDictDto: CreateDictDto, req: Request) {
     const existingCode = await this.dictRepository.findOne({
       where: { code: createDictDto.code },
@@ -45,17 +56,27 @@ export class DictsService {
     return newDict;
   }
 
-  async findAll() {
-    const res = await this.dictRepository.find();
-    return res;
+  async findAll(current: number, pageSize: number): Promise<DictListResult> {
+    const [data, total] = await this.dictRepository.findAndCount({
+      where: { status: 1 },
+      take: pageSize,
+      skip: (current - 1) * pageSize,
+    });
+    return {
+      list: data,
+      total,
+    };
   }
 
   async findOne(code: string) {
     const dict = await this.dictRepository.findOne({
       where: { code, status: 1 },
       relations: ['details'],
-    })
-    return dict;
+    });
+    // formatter 格式化数据, 转换为list结构, 方便前端使用
+    return {
+      list: this.dictFormatter(dict),
+    };
   }
 
   update(id: number, updateDictDto: UpdateDictDto) {
