@@ -80,6 +80,11 @@ function combinePairs(arr: any[]) {
   }
   return result;
 }
+for (const item of props.items) {
+  if (_.isFunction(item.attrs)) {
+    console.log(item.attrs());
+  }
+}
 </script>
 
 <template>
@@ -105,7 +110,7 @@ function combinePairs(arr: any[]) {
 
 <style scoped lang="scss">
 ::v-deep(.ant-form-item-label) {
-  label:not(.ant-form-item-required){
+  label:not(.ant-form-item-required) {
     margin-left: 10px;
   }
 }
