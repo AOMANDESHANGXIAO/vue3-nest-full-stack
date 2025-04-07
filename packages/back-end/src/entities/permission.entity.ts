@@ -19,7 +19,7 @@ export class Permission {
   @Column({
     length: 50, // 权限描述
   })
-  dec: string;
+  desc: string;
 
   @CreateDateColumn()
   createTime: Date;

@@ -26,8 +26,6 @@ declare module 'vue' {
     APopconfirm: typeof import('ant-design-vue/es')['Popconfirm']
     AppearenceSetting: typeof import('./src/components/business/appearence-setting.vue')['default']
     ARow: typeof import('ant-design-vue/es')['Row']
-    ASelect: typeof import('ant-design-vue/es')['Select']
-    ASelectOption: typeof import('ant-design-vue/es')['SelectOption']
     ASpace: typeof import('ant-design-vue/es')['Space']
     AsyncFormRender: typeof import('./src/components/ant/async-form-render.vue')['default']
     ATable: typeof import('ant-design-vue/es')['Table']
@@ -36,12 +34,10 @@ declare module 'vue' {
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
     Bell: typeof import('./src/components/ui/Bell.vue')['default']
     ContentContainer: typeof import('./src/components/layouts/content-container.vue')['default']
-    FormRender: typeof import('./src/components/ant/FormRender.vue')['default']
     Loading: typeof import('./src/components/ui/Loading.vue')['default']
     MenuPage: typeof import('./src/components/business/menu-page.vue')['default']
     MenuPageContent: typeof import('./src/components/business/menu-page-content.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    Table: typeof import('./src/components/ant/Table.vue')['default']
   }
 }
