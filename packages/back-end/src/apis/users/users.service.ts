@@ -115,6 +115,17 @@ export class UsersService {
     };
   }
 
+  async findOneById(id: string): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { id, status: true },
+    });
+  }
+
+  async isUserExist(req: Request): Promise<boolean> {
+    const user = await this.findOne(req);
+    return !!user.user;
+  }
+
   async remove(id: string) {
     const user = await this.userRepository.findOne({
       where: { id, status: true },

@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from 'src/apis/users/users.module';
 import { RolesModule } from 'src/apis/roles/roles.module';
 import { AuthModule } from 'src/apis/auth/auth.module';
+import { DictsModule } from 'src/apis/dicts/dicts.module';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { ResourceModule } from 'src/apis/resources/resource.module';
@@ -32,6 +33,7 @@ import { PermissionGuard } from 'src/guards/permission/permission.guard';
     AuthModule,
     ResourceModule,
     PermissionModule,
+    DictsModule,
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
