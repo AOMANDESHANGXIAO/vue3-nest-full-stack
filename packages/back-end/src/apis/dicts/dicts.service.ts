@@ -83,7 +83,7 @@ export class DictsService {
     };
   }
 
-  async getTransferText(code: string, dictCode: string) {
+  async getTransferText(code: string, dictCode: number) {
     const dict = await this.dictRepository.findOne({
       where: { code, status: 1 },
       relations: ['details'],

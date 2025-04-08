@@ -14,7 +14,7 @@ export interface DictListResult {
 }
 
 export interface FindOneDictResult {
-  list: { id: string; label: string; value: string }[]
+  list: { id: string; label: string; value: number }[]
 }
 
 export interface GetAllDictsDetailResult {

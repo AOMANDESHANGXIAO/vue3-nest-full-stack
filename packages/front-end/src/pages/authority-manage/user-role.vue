@@ -33,6 +33,7 @@ import type { FormInstance, Rule } from "ant-design-vue/es/form";
 import type { FindAllUsersApiResult } from "@v3-nest-full-stack/shared-types";
 import AsyncFormRender from "@/components/ant/async-form-render.vue";
 import { useDictStore } from "@/stores/modules/use-dict-store";
+import { DictsApi } from "@/apis/modules/dicts";
 
 defineOptions({
   name: "role",
@@ -305,6 +306,19 @@ const editUserformRules: Record<string, Rule[]> = {
     },
   ],
 };
+const { state: statusSelectList, execute: fetchStatusSelectList } =
+  useAsyncState(
+    DictsApi.getDict,
+    {
+      list: [],
+    },
+    {
+      immediate: false,
+    }
+  );
+onMounted(() => {
+  fetchStatusSelectList(0, "status");
+});
 const editFormItems = ref([
   {
     key: "username",
@@ -356,17 +370,8 @@ const editFormItems = ref([
     attrs: () => {
       return {
         placeholder: "请选择",
-        options: [
-          {
-            label: "启用",
-            value: true,
-          },
-          {
-            label: "禁用",
-            value: false,
-          },
-        ],
-        defaultValue: true,
+        options: statusSelectList.value.list,
+        // defaultValue: true,
       };
     },
   },
