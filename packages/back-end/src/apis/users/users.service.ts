@@ -110,14 +110,14 @@ export class UsersService {
     const user = req.user;
     return {
       user: await this.userRepository.findOne({
-        where: { id: user.uuid, status: true },
+        where: { id: user.uuid, status: 1 },
       }),
     };
   }
 
   async findOneById(id: string): Promise<User> {
     return await this.userRepository.findOne({
-      where: { id, status: true },
+      where: { id, status: 1 },
     });
   }
 
@@ -128,12 +128,12 @@ export class UsersService {
 
   async remove(id: string) {
     const user = await this.userRepository.findOne({
-      where: { id, status: true },
+      where: { id, status: 1 },
     });
     if (!user) {
       throw new Error('用户不存在');
     }
-    user.status = false;
+    user.status = 0;
     await this.userRepository.save(user);
     return {};
   }

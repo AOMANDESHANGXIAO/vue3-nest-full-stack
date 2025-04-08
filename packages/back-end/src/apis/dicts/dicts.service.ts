@@ -10,6 +10,7 @@ import { Request } from 'express';
 import type {
   DictListResult,
   FindOneDictResult,
+  GetAllDictsDetailResult
 } from '@v3-nest-full-stack/shared-types';
 
 @Injectable()
@@ -95,6 +96,26 @@ export class DictsService {
       throw new Error('字典详情不存在');
     }
     return detail.name;
+  }
+
+  async getAllDictDetails():Promise<GetAllDictsDetailResult> {
+    const dicts = await this.dictRepository.find({
+      where: { status: 1 },
+      relations: ['details'],
+    });
+    // 将Map转换为数组
+    const dictsArray = [];
+    dicts.forEach((dict) => {
+      dict.details.forEach((detail) => {
+        dictsArray.push({
+          key: `${dict.code}:${detail.code}`,
+          value: detail.name,
+        });
+      });
+    });
+    return {
+      list: dictsArray,
+    };
   }
 
   update(id: number, updateDictDto: UpdateDictDto) {

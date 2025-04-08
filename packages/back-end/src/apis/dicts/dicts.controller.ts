@@ -38,13 +38,10 @@ export class DictsController {
   findOne(@Param('code') code: string) {
     return this.dictsService.findOne(code);
   }
-
-  @Get('transfer/code')
-  getTransfer(
-    @Query('code') code: string,
-    @Query('dictCode') dictCode: string,
-  ) {
-    return this.dictsService.getTransferText(code, dictCode);
+  // 这个接口将所有的字典数据都返回给前端,让前端可以根据字典编码快速获取字典值
+  @Get("all/details")
+  findAllDetails() {
+    return this.dictsService.getAllDictDetails(); 
   }
 
   @Patch(':id')

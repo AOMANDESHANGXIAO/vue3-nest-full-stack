@@ -16,3 +16,10 @@ export interface DictListResult {
 export interface FindOneDictResult {
   list: { id: string; label: string; value: string }[]
 }
+
+export interface GetAllDictsDetailResult {
+  list: {
+    key: string
+    value: string
+  } []
+}

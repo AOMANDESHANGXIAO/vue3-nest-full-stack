@@ -8,13 +8,13 @@ export interface AdminAddUserDtoInterface extends CreateUserDtoInterface {
 }
 export interface UpdateUserDtoInterface
   extends Partial<CreateUserDtoInterface> {
-  status?: boolean
+  status?: number
   roleIds?: string[]
 }
 export interface FindOneUserApiResult {
   user: {
     id: string
-    status: boolean
+    status: number
     username: string
     nickname: string
     createTime: Date
@@ -23,7 +23,7 @@ export interface FindOneUserApiResult {
 }
 export interface UserResponse {
   id: string
-  status: boolean
+  status: number
   nickname: string
   username: string
   createTime: Date

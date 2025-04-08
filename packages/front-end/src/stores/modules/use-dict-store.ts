@@ -1,53 +1,59 @@
-import { defineStore } from 'pinia'
-import { DictsApi } from '@/apis/modules/dicts'
-import { useLocalStorage } from '@vueuse/core'
-
+import { defineStore } from "pinia";
+import { DictsApi } from "@/apis/modules/dicts";
+import { useLocalStorage } from "@vueuse/core";
+import { message } from "ant-design-vue";
+import _ from "lodash";
 // TODO: atable的customRender不支持异步函数
 // 因此，需要1. 后端实现一个接口将所有的字典数据一次性返回，然后前端缓存
 // 2. 前端实现一个字典缓存，然后在customRender中使用
-export const useDictStore = defineStore('dict', () => {
+export const useDictStore = defineStore("dict", () => {
   // 使用Map来缓存字典数据，键为 code:dictCode
-  const dictCache = useLocalStorage('dictCache', new Map<string, any>())
-
-  // 获取字典数据
-  const getDict = async (code: string, dictCode: string) => {
-    const cacheKey = `${code}:${dictCode}`
-
-    // 优先从缓存读取
-    if (dictCache.value.has(cacheKey)) {
-      return dictCache.value.get(cacheKey)
-    }
-
-    // 缓存不存在则请求接口
+  const dictCache = useLocalStorage("dictCache", {} as { [key: string]: any });
+  let isLoading = false;
+  const successMessage = _.debounce((msg: string) => {
+    message.success(msg);
+  }, 1000);
+  const errorMessage = _.debounce((msg: string) => {
+    message.error(msg);
+  });
+  // 从后端获取字典数据，并缓存到dictCache中
+  const fetchAllDictsDetails = _.debounce(async () => {
+    isLoading = true;
     try {
-      const data = await DictsApi.getTransferText(code, dictCode)
-      dictCache.value.set(cacheKey, data)
-      console.log('获取字典数据:', data)
-      return data
-    } catch (error) {
-      console.error('获取字典数据失败:', error)
-      throw error
-    }
-  }
-
-  // 清除指定字典缓存
-  const clearDictCache = (code?: string, dictCode?: string) => {
-    if (code && dictCode) {
-      dictCache.value.delete(`${code}:${dictCode}`)
-    } else if (code) {
-      // 清除该code下的所有缓存
-      for (const key of dictCache.value.keys()) {
-        if (key.startsWith(`${code}:`)) {
-          dictCache.value.delete(key)
-        }
+      dictCache.value = {};
+      const result = await DictsApi.getAlllDictsDetails();
+      for (const dict of result.list) {
+        dictCache.value[dict.key] = dict.value;
       }
-    } else {
-      dictCache.value.clear()
+      successMessage("字典数据加载完成");
+    } catch (error) {
+    } finally {
+      isLoading = false;
     }
-  }
+  }, 1000);
 
+  /**
+   *
+   * @param code 字典编码
+   * @param value 字典详情编码
+   * @example getDict("gender", "1") => 男
+   * @returns
+   */
+  const getDict = (code: string, value: string) => {
+    const key = `${code}:${value}`;
+    const val = dictCache.value[key];
+    if (val === void 0) {
+      if (isLoading) return "DICT_NOT_FOUND";
+      errorMessage(`字典数据不存在,请检查${key}是否存在。或者刷新页面`);
+      // fetchAllDictsDetails()
+      fetchAllDictsDetails();
+      return "DICT_NOT_FOUND";
+    }
+    return val;
+  };
   return {
+    dictCache,
+    fetchAllDictsDetails,
     getDict,
-    clearDictCache,
-  }
-})
+  };
+});

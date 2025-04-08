@@ -15,11 +15,11 @@ export class User {
   id: string;
 
   @Column({
-    default: true,
+    default: 1,
     comment: '该用户是否可用',
-    type: 'boolean',
+    type: 'tinyint',
   })
-  status: boolean;
+  status: number;
 
   @Column({
     length: 50,

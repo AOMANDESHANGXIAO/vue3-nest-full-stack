@@ -1,34 +1,34 @@
-import service from '@/apis'
+import service from "@/apis";
 import type {
   DictListResult,
   GetListCommonParams,
   FindOneDictResult,
-} from '@v3-nest-full-stack/shared-types'
+  GetAllDictsDetailResult,
+} from "@v3-nest-full-stack/shared-types";
 
-const baseUrl = '/dicts'
+const baseUrl = "/dicts";
 export class DictsApi {
   static async getDictList(
     params: GetListCommonParams
   ): Promise<DictListResult> {
     return service({
-      method: 'get',
+      method: "get",
       url: `${baseUrl}`,
       params,
-    })
+    });
   }
 
   static async getDict(code: string): Promise<FindOneDictResult> {
     return service({
-      method: 'get',
+      method: "get",
       url: `${baseUrl}/${code}`,
-    })
+    });
   }
 
-  static getTransferText(code: string, dictCode: string): Promise<string> {
+  static getAlllDictsDetails(): Promise<GetAllDictsDetailResult> {
     return service({
-      method: 'get',
-      url: `${baseUrl}/transfer/code`,
-      params: { code, dictCode },
-    })
+      method: "get",
+      url: `${baseUrl}/all/details`,
+    });
   }
 }

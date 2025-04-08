@@ -10,20 +10,20 @@
 </route>
 
 <script setup lang="ts">
-import ContentContainer from '@/components/layouts/content-container.vue'
-import AsyncFormRender from '@/components/ant/async-form-render.vue'
-import type { ColumnType } from 'ant-design-vue/es/table'
-import { commonDateFormatter } from '@/utils/time'
-import { useAsyncState } from '@vueuse/core'
-import { DictsApi } from '@/apis/modules/dicts'
-import _ from 'lodash'
-import { useElementSize } from '@vueuse/core'
-import { SearchOutlined, UndoOutlined } from '@ant-design/icons-vue'
-import { useDictStore } from '@/stores/modules/use-dict-store'
+import ContentContainer from "@/components/layouts/content-container.vue";
+// import AsyncFormRender from "@/components/ant/async-form-render.vue";
+import type { ColumnType } from "ant-design-vue/es/table";
+import { commonDateFormatter } from "@/utils/time";
+import { useAsyncState } from "@vueuse/core";
+import { DictsApi } from "@/apis/modules/dicts";
+import _ from "lodash";
+import { useElementSize } from "@vueuse/core";
+import { SearchOutlined, UndoOutlined } from "@ant-design/icons-vue";
+import { useDictStore } from "@/stores/modules/use-dict-store";
 
 defineOptions({
-  name: 'dict',
-})
+  name: "dict",
+});
 const defaultQueryOptions = {
   showSizeChanger: true,
   showQuickJumper: true,
@@ -31,15 +31,15 @@ const defaultQueryOptions = {
   showTotal: (total: number) => `共 ${total} 条`,
   pageSize: 5,
   current: 1,
-  pageSizeOptions: ['5', '10', '20', '50'],
+  pageSizeOptions: ["5", "10", "20", "50"],
   async onChange(current: number, pageSize: number) {
-    this.current = current
-    this.pageSize = pageSize
-    await nextTick()
-    handleSearch()
+    this.current = current;
+    this.pageSize = pageSize;
+    await nextTick();
+    handleSearch();
   },
-}
-const queryOptions = ref(_.cloneDeep(defaultQueryOptions))
+};
+const queryOptions = ref(_.cloneDeep(defaultQueryOptions));
 const { state, execute, isLoading } = useAsyncState(
   DictsApi.getDictList,
   {
@@ -49,76 +49,79 @@ const { state, execute, isLoading } = useAsyncState(
   {
     immediate: false,
     onSuccess(res) {
-      queryOptions.value.total = res.total
+      queryOptions.value.total = res.total;
     },
   }
-)
+);
 const handleSearch = () => {
-  execute(0, _.pick(queryOptions.value, ['current', 'pageSize']))
-}
+  execute(0, _.pick(queryOptions.value, ["current", "pageSize"]));
+};
 onMounted(() => {
-  handleSearch()
-})
-const { getDict } = useDictStore()
+  handleSearch();
+});
+const { getDict } = useDictStore();
 
 const columns: ColumnType<any>[] = [
   {
-    title: '编码',
-    dataIndex: 'code',
-    key: 'code',
-    align: 'center',
+    title: "编码",
+    dataIndex: "code",
+    key: "code",
+    align: "center",
   },
   {
-    title: '名称',
-    dataIndex: 'name',
-    key: 'name',
-    align: 'center',
+    title: "名称",
+    dataIndex: "name",
+    key: "name",
+    align: "center",
   },
   {
-    title: '描述',
-    dataIndex: 'desc',
-    key: 'desc',
-    align: 'center',
+    title: "描述",
+    dataIndex: "desc",
+    key: "desc",
+    align: "center",
   },
   {
-    title: '状态',
-    dataIndex: 'status',
-    key: 'status',
-    align: 'center',
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime',
-    key: 'createTime',
+    title: "状态",
+    dataIndex: "status",
+    key: "status",
+    align: "center",
     customRender: ({ text }: { text: string }) => {
-      return commonDateFormatter(text)
+      return getDict("status", text);
     },
-    align: 'center',
   },
   {
-    title: '更新时间',
-    dataIndex: 'updateTime',
-    key: 'updateTime',
+    title: "创建时间",
+    dataIndex: "createTime",
+    key: "createTime",
     customRender: ({ text }: { text: string }) => {
-      return commonDateFormatter(text)
+      return commonDateFormatter(text);
     },
-    align: 'center',
+    align: "center",
   },
-]
+  {
+    title: "更新时间",
+    dataIndex: "updateTime",
+    key: "updateTime",
+    customRender: ({ text }: { text: string }) => {
+      return commonDateFormatter(text);
+    },
+    align: "center",
+  },
+];
 
-const searchFormRef = useTemplateRef('searchFormRef')
-const { height } = useElementSize(searchFormRef)
+const searchFormRef = useTemplateRef("searchFormRef");
+const { height } = useElementSize(searchFormRef);
 const tableContainerStyle = computed(() => {
   return {
     height: `calc(100% - ${height.value}px)`,
-    width: '100%',
-  }
-})
+    width: "100%",
+  };
+});
 const searchFormModel = ref({
-  code: '',
-  name: '',
+  code: "",
+  name: "",
   status: undefined,
-})
+});
 const { state: statusDictList, execute: statusDictListExecute } = useAsyncState(
   DictsApi.getDict,
   {
@@ -127,10 +130,10 @@ const { state: statusDictList, execute: statusDictListExecute } = useAsyncState(
   {
     immediate: false,
   }
-)
+);
 onMounted(() => {
-  statusDictListExecute(0, 'status')
-})
+  statusDictListExecute(0, "status");
+});
 </script>
 
 <template>
@@ -178,16 +181,11 @@ onMounted(() => {
         :loading="isLoading"
         :scroll="{ x: '100%', y: 'max-content' }"
       >
-        <template #bodyCell="{ column, record }">
-          <div v-if="column.dataIndex === 'status'">
-            {{ getDict('status', record.status) }}
-          </div>
-        </template>
       </a-table>
     </div>
   </ContentContainer>
 </template>
 
 <style scoped lang="scss">
-@import url('@/styles/a-table.scss');
+@import url("@/styles/a-table.scss");
 </style>
