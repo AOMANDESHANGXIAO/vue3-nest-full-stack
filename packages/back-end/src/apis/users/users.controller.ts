@@ -43,6 +43,8 @@ export class UsersController {
     return this.usersService.findOne(req);
   }
 
+  // TODO: refactor here
+  // 这样无法做接口的校验
   @Get('/all')
   findAll(@Query('query') query: string) {
     const obj: QueryUserDto = JSON.parse(query);

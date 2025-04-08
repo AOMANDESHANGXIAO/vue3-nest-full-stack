@@ -5,6 +5,7 @@ import type {
   FindOneUserApiResult,
   FindAllUsersApiResult,
   UpdateUserDtoInterface,
+  GetAllUsersDtoInterface
 } from '@v3-nest-full-stack/shared-types'
 
 const baseUrl = '/users'
@@ -24,20 +25,8 @@ export class UserApi {
     })
   }
   static async getAllUsers(
-    params: {
-      pageSize: number
-      current: number
-    },
-    queryKeyWord?: {
-      username?: string
-      nickname?: string
-      status?: number
-      roleIds?: string[]
-    }
+    params: GetAllUsersDtoInterface,
   ): Promise<FindAllUsersApiResult> {
-    if (queryKeyWord) {
-      params = { ...params, ...queryKeyWord }
-    }
     return service({
       method: 'get',
       url: `${baseUrl}/all`,

@@ -3,6 +3,16 @@ export interface CreateUserDtoInterface {
   password: string
   nickname: string
 }
+
+export interface GetAllUsersDtoInterface {
+  pageSize: number
+  current: number
+  username?: string
+  nickname?: string
+  status?: number
+  roleIds?: string[]
+}
+
 export interface AdminAddUserDtoInterface extends CreateUserDtoInterface {
   roleIds?: string[]
 }

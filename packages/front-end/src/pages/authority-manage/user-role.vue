@@ -35,7 +35,10 @@ import FormRenderer from '@/components/ant/form-renderer.vue'
 import { useDictStore } from '@/stores/modules/use-dict-store'
 import { DictsApi } from '@/apis/modules/dicts'
 import { Input, Select } from 'ant-design-vue'
+import type { GetAllUsersDtoInterface } from '@v3-nest-full-stack/shared-types'
 
+// TODO: refactor this code
+// 将表单和表格的逻辑抽离为useForm和useTable
 defineOptions({
   name: 'role',
 })
@@ -99,9 +102,9 @@ const defaultQueryOptions = {
   showQuickJumper: true,
   total: 0,
   showTotal: (total: number) => `共 ${total} 条`,
-  pageSize: 5,
-  current: 1,
-  queryKeyWord: {
+  params: {
+    pageSize: 5,
+    current: 1,
     username: '',
     nickname: '',
     roleIds: [] as string[],
@@ -109,25 +112,29 @@ const defaultQueryOptions = {
   },
   pageSizeOptions: ['5', '10', '20', '50'],
   async onChange(current: number, pageSize: number) {
-    this.current = current
-    this.pageSize = pageSize
+    this.params.current = current
+    this.params.pageSize = pageSize
     await nextTick()
     handleSearch()
   },
 }
+
 const queryOptions = ref(_.cloneDeep(defaultQueryOptions))
 const queryParams = computed(() => {
-  // return _.pick(queryOptions.value, ['keyWord', 'current', 'pageSize'])
-  const params = _.pick(queryOptions.value, ['current', 'pageSize'])
-  const queryKeyWord = _.pickBy(
-    queryOptions.value.queryKeyWord,
+  return _.pickBy(
+    queryOptions.value.params,
     value =>
       value !== undefined &&
       value !== '' &&
       (_.isArray(value) ? value.length > 0 : true)
-  )
-  return { ...params, ...queryKeyWord }
+  ) as unknown as GetAllUsersDtoInterface
 })
+watch(
+  () => queryParams.value,
+  _.debounce(() => {
+    handleSearch()
+  }, 5000)
+)
 const { state, isLoading, execute } = useAsyncState(
   UserApi.getAllUsers,
   {
@@ -479,19 +486,19 @@ useResizeObserver(
     <a-form layout="inline" class="mb-4 relative" ref="searchFormRef">
       <a-form-item label="账号">
         <a-input
-          v-model:value="queryOptions.queryKeyWord.username"
+          v-model:value="queryOptions.params.username"
           placeholder="请输入"
         />
       </a-form-item>
       <a-form-item label="昵称">
         <a-input
-          v-model:value="queryOptions.queryKeyWord.nickname"
+          v-model:value="queryOptions.params.nickname"
           placeholder="请输入"
         />
       </a-form-item>
       <a-form-item label="角色">
         <a-select
-          v-model:value="queryOptions.queryKeyWord.roleIds"
+          v-model:value="queryOptions.params.roleIds"
           placeholder="请选择"
           :style="{
             width: '200px',
@@ -508,7 +515,7 @@ useResizeObserver(
       </a-form-item>
       <a-form-item label="状态">
         <a-select
-          v-model:value="queryOptions.queryKeyWord.status"
+          v-model:value="queryOptions.params.status"
           placeholder="请选择"
           :options="statusSelectList.list"
         />
