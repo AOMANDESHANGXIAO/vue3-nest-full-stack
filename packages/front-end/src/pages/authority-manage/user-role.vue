@@ -31,9 +31,10 @@ import { useElementSize } from "@vueuse/core";
 import { commonDateFormatter } from "@/utils/time";
 import type { Rule } from "ant-design-vue/es/form";
 import type { FindAllUsersApiResult } from "@v3-nest-full-stack/shared-types";
-import AsyncFormRender from "@/components/ant/async-form-render.vue";
+import FormRenderer from "@/components/ant/form-renderer.vue";
 import { useDictStore } from "@/stores/modules/use-dict-store";
 import { DictsApi } from "@/apis/modules/dicts";
+import { Input, Select } from "ant-design-vue";
 
 defineOptions({
   name: "role",
@@ -176,8 +177,6 @@ const handleClickAdd = () => {
   handleSubmit = addUser;
   formStatus.value = "add";
   isModalOpen.value = true;
-  console.log("addUserformData", addUserformData.value);
-  console.log("addUserItems", addUserFormItems.value);
 };
 const {
   state: rolesState,
@@ -211,39 +210,42 @@ const rolesData = computed(() => {
   });
 });
 const isAddUserLoading = ref(false);
-const asyncFormRef = ref<InstanceType<typeof AsyncFormRender> | null>(null);
+const formRendererRef = useTemplateRef("formRendererRef");
+
 const addUser = async () => {
-  if (!asyncFormRef.value) {
+  if (!formRendererRef.value) {
     return;
   }
-  try {
-    const res = await asyncFormRef.value.aFormRef?.validate();
-    if (!res) {
-      return;
-    }
-    await UserApi.addUser(addUserformData.value);
-    message.success("添加成功");
-    addUserformData.value = {
-      nickname: "",
-      username: "",
-      password: "",
-      roleIds: [],
-    };
-    handleSearch();
-    isModalOpen.value = false;
-  } catch (error) {
-    console.error(error);
-  } finally {
-    isAddUserLoading.value = false;
+  const formRef = formRendererRef.value.getFormRef();
+  if (!formRef) {
+    return;
   }
+  formRef
+    .validate()
+    .then(async () => {
+      await UserApi.addUser(addUserformData.value);
+      message.success("添加成功");
+      addUserformData.value = {
+        nickname: "",
+        username: "",
+        password: "",
+        roleIds: [],
+      };
+      handleSearch();
+      isModalOpen.value = false;
+    })
+    .catch((_) => {})
+    .finally(() => {
+      isAddUserLoading.value = false;
+    });
 };
 let handleSubmit = addUser;
-const addUserFormItems = ref([
+const addUserFormItems = [
   {
     key: "username",
     label: "账号",
     name: "username",
-    component: "Input",
+    component: Input,
     attrs: {
       placeholder: "请输入",
     },
@@ -252,7 +254,7 @@ const addUserFormItems = ref([
     key: "nickname",
     label: "昵称",
     name: "nickname",
-    component: "Input",
+    component: Input,
     attrs: {
       placeholder: "请输入",
     },
@@ -261,7 +263,7 @@ const addUserFormItems = ref([
     key: "password",
     label: "密码",
     name: "password",
-    component: "Input",
+    component: Input,
     attrs: {
       placeholder: "请输入",
     },
@@ -270,7 +272,7 @@ const addUserFormItems = ref([
     key: "roles",
     label: "角色",
     name: "roles",
-    component: "Select",
+    component: Select,
     attrs: () => {
       return {
         mode: "multiple",
@@ -287,7 +289,7 @@ const addUserFormItems = ref([
       };
     },
   },
-]);
+];
 
 const editUserFormData = ref<UpdateUserDtoInterface>({
   nickname: "",
@@ -323,12 +325,12 @@ const { state: statusSelectList, execute: fetchStatusSelectList } =
 onMounted(() => {
   fetchStatusSelectList(0, "status");
 });
-const editFormItems = ref([
+const editFormItems = [
   {
     key: "username",
     label: "账号",
     name: "username",
-    component: "Input",
+    component: Input,
     attrs: {
       placeholder: "请输入",
       disabled: true,
@@ -338,7 +340,7 @@ const editFormItems = ref([
     key: "nickname",
     label: "昵称",
     name: "nickname",
-    component: "Input",
+    component: Input,
     attrs: {
       placeholder: "请输入",
     },
@@ -347,7 +349,7 @@ const editFormItems = ref([
     key: "roleIds",
     label: "角色",
     name: "roleIds",
-    component: "Select",
+    component: Select,
     attrs: () => {
       return {
         mode: "multiple",
@@ -370,7 +372,7 @@ const editFormItems = ref([
     key: "status",
     label: "状态",
     name: "status",
-    component: "Select",
+    component: Select,
     attrs: () => {
       return {
         placeholder: "请选择",
@@ -379,27 +381,33 @@ const editFormItems = ref([
       };
     },
   },
-]);
+];
 const editUser = async () => {
-  if (!asyncFormRef.value) {
+  if (!formRendererRef.value) {
     return;
   }
-  try {
-    await UserApi.updateUser(id, editUserFormData.value);
-    message.success("编辑成功");
-    editUserFormData.value = {
-      nickname: "",
-      username: "",
-      roleIds: [],
-      status: 1,
-    };
-    isModalOpen.value = false;
-    handleSearch();
-  } catch (error) {
-    console.error(error);
-  } finally {
-    isAddUserLoading.value = false;
+  const formRef = formRendererRef.value.getFormRef();
+  if (!formRef) {
+    return;
   }
+  formRef
+    .validate()
+    .then(async () => {
+      await UserApi.updateUser(id, editUserFormData.value);
+      message.success("编辑成功");
+      editUserFormData.value = {
+        nickname: "",
+        username: "",
+        roleIds: [],
+        status: 1,
+      };
+      isModalOpen.value = false;
+      handleSearch();
+    })
+    .catch((_) => {})
+    .finally(() => {
+      isAddUserLoading.value = false;
+    });
 };
 
 let id = "";
@@ -450,13 +458,13 @@ useResizeObserver(
           <div>Loading model</div>
         </template>
         <template #default>
-          <AsyncFormRender
+          <FormRenderer
             v-if="isModalOpen"
-            ref="asyncFormRef"
+            ref="formRendererRef"
             :model="formStatus === 'add' ? addUserformData : editUserFormData"
             :rules="formStatus === 'add' ? addUserformRules : editUserformRules"
             :items="formStatus === 'add' ? addUserFormItems : editFormItems"
-          ></AsyncFormRender>
+          ></FormRenderer>
         </template>
       </Suspense>
     </a-modal>

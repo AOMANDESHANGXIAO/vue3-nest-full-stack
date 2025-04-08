@@ -32,6 +32,7 @@ declare module 'vue' {
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
     Bell: typeof import('./src/components/ui/Bell.vue')['default']
     ContentContainer: typeof import('./src/components/layouts/content-container.vue')['default']
+    FormRenderer: typeof import('./src/components/ant/form-renderer.vue')['default']
     Loading: typeof import('./src/components/ui/Loading.vue')['default']
     MenuPage: typeof import('./src/components/business/menu-page.vue')['default']
     MenuPageContent: typeof import('./src/components/business/menu-page-content.vue')['default']
