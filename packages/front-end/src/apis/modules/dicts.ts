@@ -18,7 +18,7 @@ export class DictsApi {
     });
   }
 
-  static async getDict(code: string): Promise<FindOneDictResult> {
+  static async getSelectableDictList(code: string): Promise<FindOneDictResult> {
     return service({
       method: "get",
       url: `${baseUrl}/${code}`,

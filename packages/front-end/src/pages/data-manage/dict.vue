@@ -123,7 +123,7 @@ const searchFormModel = ref({
   status: undefined,
 });
 const { state: statusDictList, execute: statusDictListExecute } = useAsyncState(
-  DictsApi.getDict,
+  DictsApi.getSelectableDictList,
   {
     list: [],
   },

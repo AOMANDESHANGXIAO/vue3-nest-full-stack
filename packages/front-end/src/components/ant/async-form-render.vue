@@ -5,7 +5,7 @@
  设计为异步组件的原因是为了提高性能，避免将没有使用的ant-design组件一起打包。
  -->
 <script setup lang="ts">
-import type { Rule } from "ant-design-vue/es/form";
+import type { FormInstance, Rule } from "ant-design-vue/es/form";
 import _ from "lodash";
 
 defineOptions({
@@ -80,10 +80,17 @@ function combinePairs(arr: any[]) {
   }
   return result;
 }
+defineEmits({
+  "validate": (valid: boolean) => valid,
+});
+const formRef = ref<FormInstance>();
+onMounted(()=>{
+  console.log('formRef.value',formRef.value)
+})
 </script>
 
 <template>
-  <a-form layout="horizontal" :model="model" :rules="rules">
+  <a-form layout="horizontal" :model="model" :rules="rules" ref="formRef">
     <template
       v-for="pair in combinePairs(props.items)"
       :key="`key-${pair[0].name}`"

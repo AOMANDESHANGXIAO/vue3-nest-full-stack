@@ -29,7 +29,7 @@ import _ from "lodash";
 import type { ColumnType } from "ant-design-vue/es/table";
 import { useElementSize } from "@vueuse/core";
 import { commonDateFormatter } from "@/utils/time";
-import type { FormInstance, Rule } from "ant-design-vue/es/form";
+import type { Rule } from "ant-design-vue/es/form";
 import type { FindAllUsersApiResult } from "@v3-nest-full-stack/shared-types";
 import AsyncFormRender from "@/components/ant/async-form-render.vue";
 import { useDictStore } from "@/stores/modules/use-dict-store";
@@ -211,11 +211,16 @@ const rolesData = computed(() => {
   });
 });
 const isAddUserLoading = ref(false);
-const formRef = useTemplateRef<FormInstance>("formRef");
+const asyncFormRef = ref<InstanceType<typeof AsyncFormRender> | null>(null);
 const addUser = async () => {
+  if (!asyncFormRef.value) {
+    return;
+  }
   try {
-    isModalOpen.value = true;
-    await formRef.value?.validate();
+    const res = await asyncFormRef.value.aFormRef?.validate();
+    if (!res) {
+      return;
+    }
     await UserApi.addUser(addUserformData.value);
     message.success("添加成功");
     addUserformData.value = {
@@ -287,7 +292,6 @@ const addUserFormItems = ref([
 const editUserFormData = ref<UpdateUserDtoInterface>({
   nickname: "",
   username: "",
-  password: "",
   roleIds: [],
   status: 1,
 });
@@ -308,7 +312,7 @@ const editUserformRules: Record<string, Rule[]> = {
 };
 const { state: statusSelectList, execute: fetchStatusSelectList } =
   useAsyncState(
-    DictsApi.getDict,
+    DictsApi.getSelectableDictList,
     {
       list: [],
     },
@@ -377,17 +381,19 @@ const editFormItems = ref([
   },
 ]);
 const editUser = async () => {
+  if (!asyncFormRef.value) {
+    return;
+  }
   try {
-    await formRef.value?.validate();
     await UserApi.updateUser(id, editUserFormData.value);
     message.success("编辑成功");
     editUserFormData.value = {
       nickname: "",
       username: "",
-      password: "",
       roleIds: [],
       status: 1,
     };
+    isModalOpen.value = false;
     handleSearch();
   } catch (error) {
     console.error(error);
@@ -446,7 +452,7 @@ useResizeObserver(
         <template #default>
           <AsyncFormRender
             v-if="isModalOpen"
-            ref="formRef"
+            ref="asyncFormRef"
             :model="formStatus === 'add' ? addUserformData : editUserFormData"
             :rules="formStatus === 'add' ? addUserformRules : editUserformRules"
             :items="formStatus === 'add' ? addUserFormItems : editFormItems"

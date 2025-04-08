@@ -14,6 +14,7 @@ import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { type UpdateUserDto } from './dto/update-user.dto';
 import { AddUserDto } from './dto/add-user.dto';
+import { STATUS } from '@v3-nest-full-stack/shared-types';
 
 @Injectable()
 export class UsersService {
@@ -110,14 +111,14 @@ export class UsersService {
     const user = req.user;
     return {
       user: await this.userRepository.findOne({
-        where: { id: user.uuid, status: 1 },
+        where: { id: user.uuid, status: STATUS.ENABLE },
       }),
     };
   }
 
   async findOneById(id: string): Promise<User> {
     return await this.userRepository.findOne({
-      where: { id, status: 1 },
+      where: { id, status: STATUS.ENABLE },
     });
   }
 
@@ -128,7 +129,7 @@ export class UsersService {
 
   async remove(id: string) {
     const user = await this.userRepository.findOne({
-      where: { id, status: 1 },
+      where: { id, status: STATUS.ENABLE },
     });
     if (!user) {
       throw new Error('用户不存在');
