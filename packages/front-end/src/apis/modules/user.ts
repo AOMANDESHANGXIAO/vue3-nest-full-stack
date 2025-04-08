@@ -23,14 +23,27 @@ export class UserApi {
       data,
     })
   }
-  static async getAllUsers(params: {
-    pageSize: number
-    current: number
-  }): Promise<FindAllUsersApiResult> {
+  static async getAllUsers(
+    params: {
+      pageSize: number
+      current: number
+    },
+    queryKeyWord?: {
+      username?: string
+      nickname?: string
+      status?: number
+      roleIds?: string[]
+    }
+  ): Promise<FindAllUsersApiResult> {
+    if (queryKeyWord) {
+      params = { ...params, ...queryKeyWord }
+    }
     return service({
       method: 'get',
       url: `${baseUrl}/all`,
-      params,
+      params: {
+        query: JSON.stringify(params),
+      },
     })
   }
   static async addUser(data: AdminAddUserDtoInterface): Promise<any> {

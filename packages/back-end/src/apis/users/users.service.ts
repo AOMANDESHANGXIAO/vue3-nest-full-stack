@@ -2,7 +2,7 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { Role } from 'src/entities/role.entity';
-import { In, Not } from 'typeorm';
+import { In, Not, Like } from 'typeorm';
 import { type Repository } from 'typeorm';
 import { type CreateUserDto } from './dto/create-user.dto';
 import type {
@@ -95,8 +95,32 @@ export class UsersService {
   async findAll(
     current: number,
     pageSize: number,
+    queryKeyWord?: {
+      username?: string;
+      nickname?: string;
+      status?: STATUS;
+      roleIds?: string[];
+    },
   ): Promise<FindAllUsersApiResult> {
+    const where: any = {};
+
+    if (queryKeyWord?.username) {
+      where.username = Like(`%${queryKeyWord.username}%`);
+    }
+    if (queryKeyWord?.nickname) {
+      where.nickname = Like(`%${queryKeyWord.nickname}%`);
+    }
+    if (queryKeyWord?.status || queryKeyWord.status === 0) {
+      where.status = queryKeyWord.status;
+    }
+    if (queryKeyWord?.roleIds) {
+      where.roles = {
+        id: In(queryKeyWord.roleIds),
+      };
+    }
+
     const [users, total] = await this.userRepository.findAndCount({
+      where,
       relations: ['roles'],
       take: pageSize,
       skip: (current - 1) * pageSize,

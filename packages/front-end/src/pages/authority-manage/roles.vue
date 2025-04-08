@@ -1,10 +1,10 @@
 <route lang="json">
 {
   "meta": {
-    "title": "角色表",
+    "title": "角色",
     "menuOrder": 1,
     "showInMenu": true,
-    "breadcrumbName": "角色表"
+    "breadcrumbName": "角色"
   }
 }
 </route>

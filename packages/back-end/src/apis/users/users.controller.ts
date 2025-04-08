@@ -7,7 +7,6 @@ import {
   Body,
   Request,
   Query,
-  ParseIntPipe,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -16,6 +15,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { RequireLogin, isPublic } from 'src/decorators/custom-decorator';
 import { Request as ExpressRequest } from 'express';
 import { AddUserDto } from './dto/add-user.dto';
+import { QueryUserDto } from './dto/query-user.dto';
 
 @RequireLogin()
 @Controller('users')
@@ -44,11 +44,10 @@ export class UsersController {
   }
 
   @Get('/all')
-  findAll(
-    @Query('current', ParseIntPipe) current: number,
-    @Query('pageSize', ParseIntPipe) pageSize: number,
-  ) {
-    return this.usersService.findAll(current, pageSize);
+  findAll(@Query('query') query: string) {
+    const obj: QueryUserDto = JSON.parse(query);
+    console.log('get all query', query);
+    return this.usersService.findAll(obj.current, obj.pageSize, obj);
   }
 
   @Patch(':id')
