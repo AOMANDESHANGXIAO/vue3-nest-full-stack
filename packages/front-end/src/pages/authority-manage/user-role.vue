@@ -427,7 +427,6 @@ const handleClickEdit = async (
   console.log("editUserFormData", editUserFormData.value);
   handleSubmit = editUser;
 };
-// TODO: 1. 当页面大小发生变化时应该重新绘制ant-table
 const contentContainerRef = useTemplateRef("contentContainerRef");
 const aTableKey = ref(`a-table-${Date.now()}`);
 const updateTable = () => {
@@ -436,7 +435,6 @@ const updateTable = () => {
 useResizeObserver(
   contentContainerRef,
   _.debounce(() => {
-    console.log("resize");
     updateTable();
   }, 1000)
 );
