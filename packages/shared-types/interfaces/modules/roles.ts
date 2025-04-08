@@ -5,7 +5,7 @@ export interface CreateRoleInterface {
 export interface UpdateRoleInterface extends CreateRoleInterface {}
 export interface RoleOperatorRecord {
   id: string
-  status: boolean
+  status: number
   nickname: string
   username: string
   createTime: Date
@@ -16,7 +16,7 @@ export interface GetRoleListResult {
     id: string
     name: string
     desc: string
-    status: boolean
+    status: number
     createTime: Date
     updateTime: Date
     createdBy: RoleOperatorRecord
@@ -29,7 +29,7 @@ export interface GetAllRolesResult {
     id: string
     name: string
     desc: string
-    status: boolean
+    status: number
     createTime: Date
     updateTime: Date
     createdBy: RoleOperatorRecord

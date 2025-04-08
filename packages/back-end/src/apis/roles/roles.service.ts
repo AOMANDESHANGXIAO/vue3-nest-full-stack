@@ -10,6 +10,7 @@ import type {
   GetRoleListResult,
   GetAllRolesResult,
 } from '@v3-nest-full-stack/shared-types';
+import { STATUS } from '@v3-nest-full-stack/shared-types';
 
 @Injectable()
 export class RolesService {
@@ -84,7 +85,7 @@ export class RolesService {
     const user = await this.userRepository.findOneBy({ id: req.user.uuid });
     await this.roleRepository.save({
       ...role,
-      status: false,
+      status: STATUS.DISABLE,
       updatedBy: user,
     });
     return {};

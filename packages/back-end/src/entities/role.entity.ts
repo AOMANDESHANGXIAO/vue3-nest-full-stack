@@ -29,9 +29,11 @@ export class Role {
   desc: string;
 
   @Column({
-    default: true,
+    default: 1,
+    type: 'tinyint',
+    comment: '0:禁用 1:启用',
   })
-  status: boolean;
+  status: number
 
   @CreateDateColumn()
   createTime: Date;

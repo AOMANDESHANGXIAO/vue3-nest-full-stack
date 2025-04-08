@@ -16,7 +16,7 @@ export class User {
 
   @Column({
     default: 1,
-    comment: '该用户是否可用',
+    comment: '0:禁用 1:启用',
     type: 'tinyint',
   })
   status: number;

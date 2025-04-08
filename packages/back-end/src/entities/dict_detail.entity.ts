@@ -1,9 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Dict } from './dict.entity';
 
 @Entity()
@@ -19,4 +14,11 @@ export class DictDetail {
 
   @Column({ length: 50, type: 'varchar' })
   name: string; // value
+
+  @Column({
+    type: 'tinyint',
+    default: 1,
+    comment: '0:禁用 1:启用',
+  })
+  status: number;
 }
