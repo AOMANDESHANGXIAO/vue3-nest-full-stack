@@ -114,9 +114,8 @@ export class UsersService {
       where.status = queryKeyWord.status;
     }
     if (queryKeyWord?.roleIds) {
-      where.roles = {
-        id: In(queryKeyWord.roleIds),
-      };
+      // FIXME: 必须要全部包含roleIds中的角色
+      where.roles = { id: In(queryKeyWord.roleIds) };
     }
 
     const [users, total] = await this.userRepository.findAndCount({
