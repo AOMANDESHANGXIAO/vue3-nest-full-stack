@@ -15,9 +15,10 @@ import ContentContainer from '@/components/layouts/content-container.vue'
 import { UserApi } from '@/apis/modules/user'
 import { RolesApi } from '@/apis/modules/roles'
 import { useAsyncState, useResizeObserver } from '@vueuse/core'
-import type {
-  AdminAddUserDtoInterface,
-  UpdateUserDtoInterface,
+import {
+  STATUS,
+  type AdminAddUserDtoInterface,
+  type UpdateUserDtoInterface,
 } from '@v3-nest-full-stack/shared-types'
 import { message } from 'ant-design-vue'
 import {
@@ -133,7 +134,7 @@ watch(
   () => queryParams.value,
   _.debounce(() => {
     handleSearch()
-  }, 5000)
+  }, 500)
 )
 const { state, isLoading, execute } = useAsyncState(
   UserApi.getAllUsers,
@@ -209,9 +210,6 @@ const {
     list: [],
   },
   {
-    onSuccess(data) {
-      console.log('get all roles', data)
-    },
     immediate: true,
   }
 )
@@ -311,12 +309,11 @@ const addUserFormItems = [
     },
   },
 ]
-
 const editUserFormData = ref<UpdateUserDtoInterface>({
   nickname: '',
   username: '',
   roleIds: [],
-  status: 1,
+  status: STATUS.ENABLE,
 })
 const editUserformRules: Record<string, Rule[]> = {
   username: [
@@ -398,7 +395,6 @@ const editFormItems = [
       return {
         placeholder: '请选择',
         options: statusSelectList.value.list,
-        // defaultValue: true,
       }
     },
   },
@@ -445,7 +441,6 @@ const handleClickEdit = async (
     roleIds: record.roles.map(item => item.id),
     status: record.status,
   }
-  console.log('editUserFormData', editUserFormData.value)
   handleSubmit = editUser
 }
 const contentContainerRef = useTemplateRef('contentContainerRef')
