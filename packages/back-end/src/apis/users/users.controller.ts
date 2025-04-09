@@ -6,7 +6,6 @@ import {
   Param,
   Body,
   Request,
-  Query,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -15,8 +14,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { RequireLogin, isPublic } from 'src/decorators/custom-decorator';
 import { Request as ExpressRequest } from 'express';
 import { AddUserDto } from './dto/add-user.dto';
-import { QueryUserDto } from './dto/query-user.dto';
 import { Base64ToJsonParam } from 'src/decorators/param-decorators';
+import { GetAllUsersQueryParams } from '@v3-nest-full-stack/shared-types';
 
 @RequireLogin()
 @Controller('users')
@@ -45,9 +44,12 @@ export class UsersController {
   }
 
   @Get('/all/:params')
-  findAll2(@Base64ToJsonParam('params') params: QueryUserDto) {
-    const obj: QueryUserDto = { ...params };
-    return this.usersService.findAll(obj.current, obj.pageSize, obj);
+  findAll2(@Base64ToJsonParam('params') params: GetAllUsersQueryParams) {
+    return this.usersService.findAll(
+      params.current,
+      params.pageSize,
+      params.conditions,
+    );
   }
 
   @Patch(':id')

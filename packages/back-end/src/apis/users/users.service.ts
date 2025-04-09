@@ -95,7 +95,7 @@ export class UsersService {
   async findAll(
     current: number,
     pageSize: number,
-    queryKeyWord?: {
+    conditions?: {
       username?: string;
       nickname?: string;
       status?: STATUS;
@@ -103,21 +103,23 @@ export class UsersService {
     },
   ): Promise<FindAllUsersApiResult> {
     const where: any = {};
-
-    if (queryKeyWord?.username) {
-      where.username = Like(`%${queryKeyWord.username}%`);
+    console.log('conditions', conditions);
+    if (conditions) {
+      if (conditions?.username) {
+        where.username = Like(`%${conditions.username}%`);
+      }
+      if (conditions?.nickname) {
+        where.nickname = Like(`%${conditions.nickname}%`);
+      }
+      if (conditions?.status || conditions.status === STATUS.DISABLE) {
+        console.log('conditions.status', conditions.status);
+        where.status = conditions.status;
+      }
+      if (conditions?.roleIds) {
+        console.log('conditions.roleIds', conditions.roleIds);
+        where.roles = { id: In(conditions.roleIds) };
+      }
     }
-    if (queryKeyWord?.nickname) {
-      where.nickname = Like(`%${queryKeyWord.nickname}%`);
-    }
-    if (queryKeyWord?.status || queryKeyWord.status === 0) {
-      where.status = queryKeyWord.status;
-    }
-    if (queryKeyWord?.roleIds) {
-      // FIXME: 必须要全部包含roleIds中的角色
-      where.roles = { id: In(queryKeyWord.roleIds) };
-    }
-
     const [users, total] = await this.userRepository.findAndCount({
       where,
       relations: ['roles'],

@@ -5,7 +5,7 @@ import type {
   FindOneUserApiResult,
   FindAllUsersApiResult,
   UpdateUserDtoInterface,
-  GetAllUsersQueryParams
+  GetAllUsersQueryParams,
 } from '@v3-nest-full-stack/shared-types'
 import * as Base64 from 'js-base64'
 const baseUrl = '/users'
@@ -25,8 +25,9 @@ export class UserApi {
     })
   }
   static async getAllUsers(
-    params: GetAllUsersQueryParams,
+    params: GetAllUsersQueryParams
   ): Promise<FindAllUsersApiResult> {
+    console.log('getAllUsers params:', params)
     return service({
       method: 'get',
       url: `${baseUrl}/all/${Base64.encode(JSON.stringify(params))}`,
