@@ -11,10 +11,11 @@ import { ConfigModule } from '@nestjs/config';
 import { ResourceModule } from 'src/apis/resources/resource.module';
 import { PermissionModule } from 'src/apis/permission/permission.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import configuration from 'src/config/configuration';
 import { LoginGuard } from 'src/guards/login/login.guard';
 import { PermissionGuard } from 'src/guards/permission/permission.guard';
+import { ValidationPipe } from './pipes/validation.pipe';
 
 @Module({
   /**
@@ -46,6 +47,7 @@ import { PermissionGuard } from 'src/guards/permission/permission.guard';
     JwtService,
     { provide: APP_GUARD, useClass: LoginGuard },
     { provide: APP_GUARD, useClass: PermissionGuard },
+    { provide: APP_PIPE, useClass: ValidationPipe },
   ],
 })
 export class AppModule {}

@@ -10,9 +10,7 @@ import { validate } from 'class-validator';
 @Injectable()
 export class ValidationPipe implements PipeTransform {
   async transform(value: any, { metatype }: ArgumentMetadata) {
-    if (metatype !== String && typeof value === 'string') {
-      value = JSON.parse(value);
-    }
+    console.log('value', value);
     if (!metatype || !this.toValidate(metatype)) {
       // 如果没有传入验证规则，则不验证，直接返回数据
       return value;

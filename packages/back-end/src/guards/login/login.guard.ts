@@ -32,7 +32,6 @@ export class LoginGuard implements CanActivate {
       REQUIRE_LOGIN_KEY,
       [context.getHandler(), context.getClass()],
     );
-    console.log('login guard isRequiredLogin', isRequiredLogin)
     if (!isRequiredLogin) {
       return true;
     }
@@ -48,7 +47,6 @@ export class LoginGuard implements CanActivate {
       // so that we can access it in our route handlers
       request['user'] = payload;
     } catch (e) {
-      console.log('login-guard error', e);
       throw new UnauthorizedException();
     }
     return true;

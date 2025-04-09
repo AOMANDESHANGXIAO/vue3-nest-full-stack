@@ -7,7 +7,7 @@ import type {
   UpdateUserDtoInterface,
   GetAllUsersDtoInterface
 } from '@v3-nest-full-stack/shared-types'
-
+import * as Base64 from 'js-base64'
 const baseUrl = '/users'
 
 export class UserApi {
@@ -29,10 +29,7 @@ export class UserApi {
   ): Promise<FindAllUsersApiResult> {
     return service({
       method: 'get',
-      url: `${baseUrl}/all`,
-      params: {
-        params: JSON.stringify(params),
-      },
+      url: `${baseUrl}/all/${Base64.encode(JSON.stringify(params))}`,
     })
   }
   static async addUser(data: AdminAddUserDtoInterface): Promise<any> {

@@ -16,6 +16,7 @@ import { RequireLogin, isPublic } from 'src/decorators/custom-decorator';
 import { Request as ExpressRequest } from 'express';
 import { AddUserDto } from './dto/add-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
+import { Base64ToJsonParam } from 'src/decorators/param-decorators';
 
 @RequireLogin()
 @Controller('users')
@@ -43,10 +44,8 @@ export class UsersController {
     return this.usersService.findOne(req);
   }
 
-  // TODO: refactor here
-  // 这样无法做接口的校验
-  @Get('/all')
-  findAll(@Query('params') params: QueryUserDto) {
+  @Get('/all/:params')
+  findAll2(@Base64ToJsonParam('params') params: QueryUserDto) {
     const obj: QueryUserDto = { ...params };
     return this.usersService.findAll(obj.current, obj.pageSize, obj);
   }

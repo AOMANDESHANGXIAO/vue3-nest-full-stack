@@ -1,5 +1,6 @@
 import { SetMetadata } from '@nestjs/common';
-import { REQUIRE_PERMISSIONS_KEY, REQUIRE_LOGIN_KEY } from '../constants';
+import { REQUIRE_PERMISSIONS_KEY, REQUIRE_LOGIN_KEY,PARAMS_STRING2OBJ_KEY } from '../constants';
+import { createParamDecorator,ExecutionContext } from '@nestjs/common';
 
 // 需要登录装饰器，修饰controller或者单个方法都可以
 export const RequireLogin = () => SetMetadata(REQUIRE_LOGIN_KEY, true);
