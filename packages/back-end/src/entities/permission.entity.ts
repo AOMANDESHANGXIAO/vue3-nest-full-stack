@@ -4,7 +4,11 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToOne,
+  ManyToMany,
 } from 'typeorm';
+import { User } from './user.entity';
+import { Role } from './role.entity';
 
 @Entity()
 export class Permission {
@@ -13,6 +17,7 @@ export class Permission {
 
   @Column({
     length: 20,
+    unique: true, // 唯一约束
   })
   name: string; // 权限名称
 
@@ -21,9 +26,24 @@ export class Permission {
   })
   desc: string;
 
+  @Column({
+    default: 1, // 状态 1: 启用 0: 禁用
+    type: 'tinyint',
+  })
+  status: number;
+
+  @ManyToMany(() => Role)
+  haveBy: Role[];
+
   @CreateDateColumn()
   createTime: Date;
 
   @UpdateDateColumn()
   updateTime: Date;
+
+  @ManyToOne(() => User) // 创建人
+  createBy: User; // 创建人
+
+  @ManyToOne(() => User) // 更新人
+  updateBy: User;
 }

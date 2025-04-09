@@ -1,17 +1,16 @@
 <route lang="json">
 {
   "meta": {
-    "title": "字典管理",
+    "title": "字典",
     "menuOrder": 1,
     "showInMenu": true,
-    "breadcrumbName": "字典管理"
+    "breadcrumbName": "字典"
   }
 }
 </route>
 
 <script setup lang="ts">
 import ContentContainer from "@/components/layouts/content-container.vue";
-// import AsyncFormRender from "@/components/ant/async-form-render.vue";
 import type { ColumnType } from "ant-design-vue/es/table";
 import { commonDateFormatter } from "@/utils/time";
 import { useAsyncState } from "@vueuse/core";
