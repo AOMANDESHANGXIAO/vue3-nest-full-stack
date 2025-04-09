@@ -11,9 +11,10 @@ async function bootstrap() {
   app.setGlobalPrefix(config.api.prefix);
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new AllExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(config.port);
+
   console.log(`Application is running on: http://localhost:${config.port}/${config.api.prefix}`);
 }
 bootstrap();

@@ -31,7 +31,7 @@ export class UserApi {
       method: 'get',
       url: `${baseUrl}/all`,
       params: {
-        query: JSON.stringify(params),
+        params: JSON.stringify(params),
       },
     })
   }

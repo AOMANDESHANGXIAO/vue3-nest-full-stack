@@ -46,9 +46,8 @@ export class UsersController {
   // TODO: refactor here
   // 这样无法做接口的校验
   @Get('/all')
-  findAll(@Query('query') query: string) {
-    const obj: QueryUserDto = JSON.parse(query);
-    console.log('get all query', query);
+  findAll(@Query('params') params: QueryUserDto) {
+    const obj: QueryUserDto = { ...params };
     return this.usersService.findAll(obj.current, obj.pageSize, obj);
   }
 
