@@ -10,7 +10,11 @@ export type ApiResponse<T> = {
   timestamp: string;
   data: T;
 };
-
+export type QueryParams<ConditionType = any> = {
+  current: number
+  pageSize: number
+  conditions?: ConditionType
+}
 export type GetListCommonParams = {
   current: number;
   pageSize: number;
