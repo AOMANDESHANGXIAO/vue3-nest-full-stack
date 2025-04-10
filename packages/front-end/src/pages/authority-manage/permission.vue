@@ -19,6 +19,12 @@ import { DictsApi } from "@/apis/modules/dicts";
 import { commonDateFormatter } from "@/utils/time";
 import { useAsyncState } from "@vueuse/core";
 import _ from "lodash";
+import {
+  PlusOutlined,
+  UndoOutlined,
+  SearchOutlined,
+} from "@ant-design/icons-vue";
+import FormRenderer from "@/components/form-renderer.vue";
 
 defineOptions({
   name: "permission",
@@ -131,10 +137,17 @@ const {
 onMounted(() => {
   execute(0, "status");
 });
+const formModalStatus = ref('add')
 </script>
 
 <template>
   <ContentContainer>
+    <a-modal>
+      <template #title>
+          {{ formModalStatus.value === 'add' ? '新增权限' : '编辑权限' }}
+      </template>
+      <FormRenderer></FormRenderer>
+    </a-modal>
     <section>
       <a-form layout="inline" class="mb-4">
         <div class="flex flex-wrap gap-4">
@@ -158,13 +171,19 @@ onMounted(() => {
           </a-form-item>
         </div>
       </a-form>
-      <div class="flex flex-wrap gap-4">
-        <a-form-item>
-          <a-button type="primary" @click="handleSearch"> 查询 </a-button>
-        </a-form-item>
-        <a-form-item>
-          <a-button @click="handleReset"> 重置 </a-button>
-        </a-form-item>
+      <div class="flex flex-wrap gap-4 mb-4">
+        <a-button type="primary" @click="handleSearch">
+          <SearchOutlined />
+          <span class="ml-2">搜索</span>
+        </a-button>
+        <a-button @click="handleReset">
+          <UndoOutlined />
+          <span class="ml-2">重置</span>
+        </a-button>
+        <a-button type="primary" @click="handleReset">
+          <PlusOutlined />
+          <span class="ml-2">新增</span>
+        </a-button>
       </div>
     </section>
     <section class="w-full">
