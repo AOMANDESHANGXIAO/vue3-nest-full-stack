@@ -24,7 +24,8 @@ import {
   UndoOutlined,
   SearchOutlined,
 } from "@ant-design/icons-vue";
-import FormRenderer from "@/components/form-renderer.vue";
+import FormRenderer from "@/components/ant/form-renderer.vue";
+import { Input, message } from "ant-design-vue";
 
 defineOptions({
   name: "permission",
@@ -88,6 +89,12 @@ const columns: ColumnType[] = [
     },
     align: "center",
   },
+  {
+    title: "操作",
+    dataIndex: "action",
+    key: "action",
+    align: "center",
+  },
 ];
 const conditions = ref({
   name: "",
@@ -137,16 +144,91 @@ const {
 onMounted(() => {
   execute(0, "status");
 });
-const formModalStatus = ref('add')
+const formModalStatus = ref("add");
+const isFormModalOpen = ref(false);
+const formModel = ref({
+  name: "",
+  desc: "",
+});
+const formRules = {
+  name: [
+    { required: true, message: "请输入权限名称" },
+    { max: 50, message: "权限名称最多50个字符" },
+  ],
+  desc: [{ max: 200, message: "描述最多200个字符" }],
+};
+const formItems = ref([
+  {
+    key: "name",
+    label: "权限名称",
+    name: "name",
+    component: Input,
+  },
+  {
+    key: "desc",
+    label: "描述",
+    name: "desc",
+    component: Input,
+  },
+]);
+const handleClickAdd = () => {
+  isFormModalOpen.value = true;
+  formModalStatus.value = "create";
+};
+const handleClickEdit = (record: any) => {
+  isFormModalOpen.value = true;
+  formModalStatus.value = "update";
+  formModel.value = record;
+};
+const handleClickDelete = (record: any) => {
+  console.log(record);
+};
+let handleSubmit = () => {
+  if (formModalStatus.value === "create") {
+    create();
+  }
+};
+const formRef = useTemplateRef<InstanceType<typeof FormRenderer>>("formRef");
+let isCreateLoading = false;
+const create = () => {
+  if (isCreateLoading) {
+    return;
+  }
+  if (!formRef.value) {
+    return;
+  }
+  const form = formRef.value.getFormRef();
+  if (!form) {
+    return;
+  }
+  isCreateLoading = true;
+  form
+    .validate()
+    .then(async () => {
+      await PermissionApi.create(formModel.value);
+      message.success("新增权限成功");
+      isFormModalOpen.value = false;
+      search();
+    })
+    .catch()
+    .finally(() => {
+      isCreateLoading = false;
+    });
+};
 </script>
 
 <template>
   <ContentContainer>
-    <a-modal>
+    <a-modal v-model:open="isFormModalOpen" @ok="handleSubmit">
       <template #title>
-          {{ formModalStatus.value === 'add' ? '新增权限' : '编辑权限' }}
+        {{ formModalStatus === "create" ? "新增权限" : "编辑权限" }}
       </template>
-      <FormRenderer></FormRenderer>
+      <FormRenderer
+        ref="formRef"
+        :model="formModel"
+        :rules="formRules"
+        :items="formItems"
+      ></FormRenderer>
     </a-modal>
     <section>
       <a-form layout="inline" class="mb-4">
@@ -180,7 +262,7 @@ const formModalStatus = ref('add')
           <UndoOutlined />
           <span class="ml-2">重置</span>
         </a-button>
-        <a-button type="primary" @click="handleReset">
+        <a-button type="primary" @click="handleClickAdd">
           <PlusOutlined />
           <span class="ml-2">新增</span>
         </a-button>
@@ -195,7 +277,28 @@ const formModalStatus = ref('add')
         :rowKey="(record) => record.id"
         :scroll="{ y: 'max-content' }"
         :bordered="false"
-      ></a-table>
+      >
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.key === 'action'">
+            <div class="flex items-center gap-2">
+              <a-button
+                type="primary"
+                @click="handleClickEdit(record)"
+                class="mr-2"
+                >编辑</a-button
+              >
+              <a-popconfirm
+                title="确定删除该权限吗？"
+                @confirm="handleClickDelete(record)"
+                ok-text="确认"
+                cancel-text="取消"
+              >
+                <a-button danger>删除</a-button>
+              </a-popconfirm>
+            </div>
+          </template>
+        </template>
+      </a-table>
     </section>
   </ContentContainer>
 </template>

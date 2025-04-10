@@ -5,3 +5,5 @@ export * from './modules/auth'
 export * from './modules/roles'
 
 export * from './modules/dicts'
+
+export * from './modules/permission'
