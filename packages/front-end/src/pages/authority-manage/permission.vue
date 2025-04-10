@@ -175,10 +175,12 @@ const handleClickAdd = () => {
   isFormModalOpen.value = true;
   formModalStatus.value = "create";
 };
+let recordId = "";
 const handleClickEdit = (record: any) => {
   isFormModalOpen.value = true;
   formModalStatus.value = "update";
   formModel.value = record;
+  recordId = record.id;
 };
 const handleClickDelete = (record: any) => {
   console.log(record);
@@ -186,12 +188,14 @@ const handleClickDelete = (record: any) => {
 let handleSubmit = () => {
   if (formModalStatus.value === "create") {
     create();
+  } else {
+    update();
   }
 };
 const formRef = useTemplateRef<InstanceType<typeof FormRenderer>>("formRef");
-let isCreateLoading = false;
+let isCreateLoading = ref(false);
 const create = () => {
-  if (isCreateLoading) {
+  if (isCreateLoading.value) {
     return;
   }
   if (!formRef.value) {
@@ -201,7 +205,7 @@ const create = () => {
   if (!form) {
     return;
   }
-  isCreateLoading = true;
+  isCreateLoading.value = true;
   form
     .validate()
     .then(async () => {
@@ -212,14 +216,40 @@ const create = () => {
     })
     .catch()
     .finally(() => {
-      isCreateLoading = false;
+      isCreateLoading.value = false;
+    });
+};
+let isUpdateLoading = ref(false);
+const update = () => {
+  if (isUpdateLoading.value) {
+    return;
+  }
+  if (!formRef.value) {
+    return;
+  }
+  const form = formRef.value.getFormRef();
+  if (!form) {
+    return;
+  }
+  isUpdateLoading.value = true;
+  form
+    .validate()
+    .then(async () => {
+      await PermissionApi.update(recordId, formModel.value);
+      message.success("更新权限成功");
+      isFormModalOpen.value = false;
+      search();
+    })
+    .catch()
+    .finally(() => {
+      isUpdateLoading.value = false;
     });
 };
 </script>
 
 <template>
   <ContentContainer>
-    <a-modal v-model:open="isFormModalOpen" @ok="handleSubmit">
+    <a-modal v-model:open="isFormModalOpen">
       <template #title>
         {{ formModalStatus === "create" ? "新增权限" : "编辑权限" }}
       </template>
@@ -229,6 +259,17 @@ const create = () => {
         :rules="formRules"
         :items="formItems"
       ></FormRenderer>
+      <template #footer>
+        <a-button @click="isFormModalOpen = false" key="back"> 取消 </a-button>
+        <a-button
+          type="primary"
+          @click="handleSubmit"
+          key="submit"
+          :loading="isCreateLoading || isUpdateLoading"
+        >
+          {{ formModalStatus === "create" ? "新增" : "更新" }}
+        </a-button>
+      </template>
     </a-modal>
     <section>
       <a-form layout="inline" class="mb-4">

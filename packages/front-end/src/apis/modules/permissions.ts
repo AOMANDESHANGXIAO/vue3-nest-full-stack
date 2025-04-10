@@ -2,6 +2,7 @@ import service from "@/apis";
 import type {
   QueryPermissionDtoType,
   QueryPermissionResult,
+  UpdatePermissionDtoType,
 } from "@v3-nest-full-stack/shared-types";
 import { Base64 } from "js-base64";
 import type { CreatePermissionDtoType } from "@v3-nest-full-stack/shared-types";
@@ -20,6 +21,13 @@ export class PermissionApi {
     return service({
       method: "post",
       url: `${baseUrl}`,
+      data,
+    });
+  }
+  static async update(id: string, data: UpdatePermissionDtoType) {
+    return service({
+      method: "patch",
+      url: `${baseUrl}/${id}`,
       data,
     });
   }

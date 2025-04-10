@@ -15,13 +15,13 @@ import { CreatePermissionDto } from './dto/create-permission.dto';
 import { Request as ExpressRequest } from 'express';
 import { Base64ToJsonParam } from 'src/decorators/param-decorators';
 import { QueryPermissionDto } from './dto/query-permission.dto';
+import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 @RequireLogin()
 @Controller('permission')
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 
-  // 增删改查
   @Post()
   async create(
     @Body() createPermissionDto: CreatePermissionDto,
@@ -31,7 +31,13 @@ export class PermissionController {
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseUUIDPipe) id: string) {}
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updatePermissionDto: UpdatePermissionDto,
+    @Request() req: ExpressRequest,
+  ) {
+    return this.permissionService.update(id, updatePermissionDto, req.user.uuid);
+  }
 
   @Delete(':id')
   async delete(@Param('id', ParseUUIDPipe) id: string) {}

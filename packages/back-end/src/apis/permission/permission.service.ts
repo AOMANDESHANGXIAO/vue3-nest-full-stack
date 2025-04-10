@@ -7,6 +7,7 @@ import { User } from 'src/entities/user.entity';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { QueryPermissionDto } from './dto/query-permission.dto';
 import type { QueryPermissionResult } from '@v3-nest-full-stack/shared-types';
+import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 @Injectable()
 export class PermissionService {
@@ -30,6 +31,21 @@ export class PermissionService {
       updateBy: user,
     });
     return await this.permissionRepository.save(permission);
+  }
+
+  async update(id: string, data: UpdatePermissionDto, userId: string) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+    const permission = await this.permissionRepository.findOneBy({ id });
+    if (!permission) {
+      throw new Error('权限不存在');
+    }
+    return await this.permissionRepository.update(id, {
+      ...data,
+      updateBy: user,
+    });
   }
 
   async findAll(data: QueryPermissionDto): Promise<QueryPermissionResult> {
