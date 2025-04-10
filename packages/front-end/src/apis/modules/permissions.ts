@@ -31,4 +31,10 @@ export class PermissionApi {
       data,
     });
   }
+  static async delete(id: string) {
+    return service({
+      method: "delete",
+      url: `${baseUrl}/${id}`,
+    });
+  }
 }

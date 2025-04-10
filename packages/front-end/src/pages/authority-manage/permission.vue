@@ -25,7 +25,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons-vue";
 import FormRenderer from "@/components/ant/form-renderer.vue";
-import { Input, message } from "ant-design-vue";
+import { Input, message, Select } from "ant-design-vue";
 
 defineOptions({
   name: "permission",
@@ -144,11 +144,16 @@ const {
 onMounted(() => {
   execute(0, "status");
 });
-const formModalStatus = ref("add");
+const formModalStatus = ref("create");
 const isFormModalOpen = ref(false);
-const formModel = ref({
+const createFormModel = ref({
   name: "",
   desc: "",
+});
+const updateFormModel = ref({
+  name: "",
+  desc: "",
+  status: undefined,
 });
 const formRules = {
   name: [
@@ -157,7 +162,7 @@ const formRules = {
   ],
   desc: [{ max: 200, message: "描述最多200个字符" }],
 };
-const formItems = ref([
+const createFormItems = ref([
   {
     key: "name",
     label: "权限名称",
@@ -171,6 +176,20 @@ const formItems = ref([
     component: Input,
   },
 ]);
+const updateFormItems = ref([
+  ...createFormItems.value,
+  {
+    key: "status",
+    label: "状态",
+    name: "status",
+    component: Select,
+    attrs: () => ({
+      placeholder: "请选择状态",
+      options: statusSelectList.value.list,
+    }),
+
+  },
+]);
 const handleClickAdd = () => {
   isFormModalOpen.value = true;
   formModalStatus.value = "create";
@@ -179,11 +198,8 @@ let recordId = "";
 const handleClickEdit = (record: any) => {
   isFormModalOpen.value = true;
   formModalStatus.value = "update";
-  formModel.value = record;
+  updateFormModel.value = record;
   recordId = record.id;
-};
-const handleClickDelete = (record: any) => {
-  console.log(record);
 };
 let handleSubmit = () => {
   if (formModalStatus.value === "create") {
@@ -209,7 +225,7 @@ const create = () => {
   form
     .validate()
     .then(async () => {
-      await PermissionApi.create(formModel.value);
+      await PermissionApi.create(createFormModel.value);
       message.success("新增权限成功");
       isFormModalOpen.value = false;
       search();
@@ -235,7 +251,7 @@ const update = () => {
   form
     .validate()
     .then(async () => {
-      await PermissionApi.update(recordId, formModel.value);
+      await PermissionApi.update(recordId, updateFormModel.value);
       message.success("更新权限成功");
       isFormModalOpen.value = false;
       search();
@@ -243,6 +259,23 @@ const update = () => {
     .catch()
     .finally(() => {
       isUpdateLoading.value = false;
+    });
+};
+let isDeleteLoading = ref(false);
+const _delete = (record: any) => {
+  if (isDeleteLoading.value) {
+    return;
+  }
+  isDeleteLoading.value = true;
+  PermissionApi.delete(record.id)
+    .then(async () => {
+      message.success("删除权限成功");
+      isFormModalOpen.value = false;
+      search();
+    })
+    .catch()
+    .finally(() => {
+      isDeleteLoading.value = false;
     });
 };
 </script>
@@ -254,10 +287,15 @@ const update = () => {
         {{ formModalStatus === "create" ? "新增权限" : "编辑权限" }}
       </template>
       <FormRenderer
+        v-if="isFormModalOpen"
         ref="formRef"
-        :model="formModel"
+        :model="
+          formModalStatus === 'create' ? createFormModel : updateFormModel
+        "
         :rules="formRules"
-        :items="formItems"
+        :items="
+          formModalStatus === 'create' ? createFormItems : updateFormItems
+        "
       ></FormRenderer>
       <template #footer>
         <a-button @click="isFormModalOpen = false" key="back"> 取消 </a-button>
@@ -330,7 +368,7 @@ const update = () => {
               >
               <a-popconfirm
                 title="确定删除该权限吗？"
-                @confirm="handleClickDelete(record)"
+                @confirm="_delete(record)"
                 ok-text="确认"
                 cancel-text="取消"
               >

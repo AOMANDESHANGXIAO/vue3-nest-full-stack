@@ -36,11 +36,20 @@ export class PermissionController {
     @Body() updatePermissionDto: UpdatePermissionDto,
     @Request() req: ExpressRequest,
   ) {
-    return this.permissionService.update(id, updatePermissionDto, req.user.uuid);
+    return this.permissionService.update(
+      id,
+      updatePermissionDto,
+      req.user.uuid,
+    );
   }
 
   @Delete(':id')
-  async delete(@Param('id', ParseUUIDPipe) id: string) {}
+  async delete(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Request() req: ExpressRequest,
+  ) {
+    return this.permissionService.delete(id, req.user.uuid);
+  }
 
   @Get(':params')
   async findAll(@Base64ToJsonParam('params') params: QueryPermissionDto) {
