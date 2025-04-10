@@ -8,6 +8,7 @@ export type QueryPermissionResult = QueryResult<{
   id: string;
   name: string;
   status: number;
+  desc: string;
   createTime: Date;
   updateTime: Date;
   createBy: {
