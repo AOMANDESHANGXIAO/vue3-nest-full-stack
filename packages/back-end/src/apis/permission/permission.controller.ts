@@ -14,6 +14,7 @@ import { RequireLogin } from 'src/decorators/custom-decorator';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { Request as ExpressRequest } from 'express';
 import { Base64ToJsonParam } from 'src/decorators/param-decorators';
+import { QueryPermissionDto } from './dto/query-permission.dto';
 
 @RequireLogin()
 @Controller('permission')
@@ -35,9 +36,9 @@ export class PermissionController {
   @Delete(':id')
   async delete(@Param('id', ParseUUIDPipe) id: string) {}
 
-  @Get()
-  async findAll(@Base64ToJsonParam('params') params: any) {
-    return await this.permissionService.findAll();
+  @Get(':params')
+  async findAll(@Base64ToJsonParam('params') params: QueryPermissionDto) {
+    return this.permissionService.findAll(params);
   }
 
   @Get(':id')

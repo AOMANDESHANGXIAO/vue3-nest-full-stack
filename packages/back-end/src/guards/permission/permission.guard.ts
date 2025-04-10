@@ -18,9 +18,7 @@ export class PermissionGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
-      console.log('permission check');
       const request: Request = context.switchToHttp().getRequest();
-      console.log(request.user);
       // 说明是不需要进行登录的接口
       // 因为login guard没有将用户信息挂上去
       if (request.user === undefined) {
@@ -43,9 +41,6 @@ export class PermissionGuard implements CanActivate {
       const isPermitted = permissions.some(
         (item) => item.name === requirePermission,
       );
-      console.log('user,s permission', permissions);
-      console.log('requirePermission', requirePermission);
-
       if (!isPermitted) {
         throw new UnauthorizedException('您没有权限访问该接口');
       }

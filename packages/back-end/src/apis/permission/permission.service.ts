@@ -5,6 +5,8 @@ import { Permission } from 'src/entities/permission.entity';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
 import { CreatePermissionDto } from './dto/create-permission.dto';
+import { QueryPermissionDto } from './dto/query-permission.dto';
+import type { QueryPermissionResult } from '@v3-nest-full-stack/shared-types';
 
 @Injectable()
 export class PermissionService {
@@ -30,8 +32,32 @@ export class PermissionService {
     return await this.permissionRepository.save(permission);
   }
 
-  async findAll() {
-    return await this.permissionRepository.find();
+  async findAll(data: QueryPermissionDto): Promise<QueryPermissionResult> {
+    const { pageSize, current, conditions } = data;
+    // 构建queryBuilder
+    const queryBuilder =
+      this.permissionRepository.createQueryBuilder('permission');
+    // 查询createBy和updateBy的用户信息
+    queryBuilder.leftJoinAndSelect('permission.createBy', 'createBy');
+    queryBuilder.leftJoinAndSelect('permission.updateBy', 'updateBy');
+    // 处理查询条件
+    if (conditions) {
+      if (conditions.name) {
+        queryBuilder.andWhere('permission.name LIKE :name', {
+          name: `%${conditions.name}%`,
+        });
+      }
+      if (conditions.status || conditions.status === 0) {
+        queryBuilder.andWhere('permission.status = :status', {
+          status: conditions.status,
+        });
+      }
+    }
+    // 处理分页
+    queryBuilder.skip((current - 1) * pageSize).take(pageSize);
+    // 获取结果
+    const [list, total] = await queryBuilder.getManyAndCount();
+    return { list, total };
   }
 
   async findOne(id: string) {

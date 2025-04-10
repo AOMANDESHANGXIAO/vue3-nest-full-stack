@@ -10,12 +10,18 @@ export type ApiResponse<T> = {
   timestamp: string;
   data: T;
 };
+/**
+ * 分页查询参数
+ */
 export type QueryParams<ConditionType = any> = {
   current: number
   pageSize: number
   conditions?: ConditionType
 }
-export type GetListCommonParams = {
-  current: number;
-  pageSize: number;
-};
+/**
+ * 分页查询返回类型定义
+ */
+export type QueryResult<T> = {
+  total: number
+  list: T[]
+}
