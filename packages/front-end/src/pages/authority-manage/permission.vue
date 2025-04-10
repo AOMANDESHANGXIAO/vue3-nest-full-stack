@@ -66,7 +66,7 @@ const columns: ColumnType[] = [
   },
   {
     title: "创建者",
-    dataIndex: "createBy.nickname",
+    dataIndex: ["createBy", "nickname"],
     key: "createBy",
     customRender: ({ text }) => {
       return text || "--";
@@ -75,7 +75,7 @@ const columns: ColumnType[] = [
   },
   {
     title: "更新者",
-    dataIndex: "updateBy.nickname",
+    dataIndex: ["updateBy", "nickname"],
     key: "updateBy",
     customRender: ({ text }) => {
       return text || "--";

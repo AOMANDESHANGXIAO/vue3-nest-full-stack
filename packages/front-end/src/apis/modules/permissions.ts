@@ -10,7 +10,6 @@ export class PermissionApi {
   static async getList(
     data: QueryPermissionDtoType
   ): Promise<QueryPermissionResult> {
-    console.log("PermissionApi.getList data=>", data);
     return service({
       method: "get",
       url: `${baseUrl}/${Base64.encodeURI(JSON.stringify(data))}`,
