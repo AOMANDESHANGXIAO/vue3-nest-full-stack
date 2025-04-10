@@ -1,23 +1,22 @@
 import service from '@/apis'
 import type {
-   GetRoleListResult,
-   CreateRoleInterface,
-   GetAllRolesResult,
+  GetRoleListResult,
+  CreateRoleInterface,
+  GetAllRolesResult,
 } from '@v3-nest-full-stack/shared-types'
-import { type UpdateRoleInterface } from '@v3-nest-full-stack/shared-types'
+import {
+  type UpdateRoleInterface,
+  type QueryRolesParams,
+} from '@v3-nest-full-stack/shared-types'
+import { Base64 } from 'js-base64'
 
 const baseUrl = '/roles'
 
 export class RolesApi {
-  static async getRoles(params: {
-    current: number
-    pageSize: number
-    keyWord?: string
-  }): Promise<GetRoleListResult> {
+  static async getRoles(params: QueryRolesParams): Promise<GetRoleListResult> {
     return service({
       method: 'get',
-      url: `${baseUrl}`,
-      params,
+      url: `${baseUrl}/page/${Base64.encode(JSON.stringify(params))}`,
     })
   }
   static async getAllRoles(params?: {
@@ -37,7 +36,7 @@ export class RolesApi {
       data,
     })
   }
-  static async updateRole(id: string,data: UpdateRoleInterface) {
+  static async updateRole(id: string, data: UpdateRoleInterface) {
     return service({
       method: 'patch',
       url: `${baseUrl}/${id}`,

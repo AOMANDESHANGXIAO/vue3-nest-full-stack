@@ -11,6 +11,7 @@ import type {
   GetAllRolesResult,
 } from '@v3-nest-full-stack/shared-types';
 import { STATUS } from '@v3-nest-full-stack/shared-types';
+import { QueryRoleDto } from './dto/query-role.dto';
 
 @Injectable()
 export class RolesService {
@@ -35,11 +36,8 @@ export class RolesService {
     return { list: roles };
   }
 
-  async findByPage(
-    pageSize: number,
-    current: number,
-    keyWord?: string,
-  ): Promise<GetRoleListResult> {
+  async findByPage(params: QueryRoleDto): Promise<GetRoleListResult> {
+    const { current, pageSize, conditions } = params;
     const queryBuilder = this.roleRepository
       .createQueryBuilder('role')
       .leftJoinAndSelect('role.createdBy', 'createdBy')
@@ -49,12 +47,16 @@ export class RolesService {
       .take(pageSize)
       .skip((current - 1) * pageSize);
 
-    if (keyWord) {
-      queryBuilder.andWhere('role.name LIKE :name', { name: `%${keyWord}%` });
+    if (conditions) {
+      if (conditions.name) {
+        queryBuilder.andWhere('role.name LIKE :name', {
+          name: `%${conditions.name}%`,
+        });
+      }
     }
 
-    const [data, total] = await queryBuilder.getManyAndCount();
-    return { list: data, total };
+    const [list, total] = await queryBuilder.getManyAndCount();
+    return { list, total };
   }
 
   async create(createRoleDto: CreateRoleDto, req: Request) {

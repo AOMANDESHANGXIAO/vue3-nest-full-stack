@@ -12,7 +12,6 @@
 <script lang="ts" setup>
 import ContentContainer from '@/components/layouts/content-container.vue'
 import { RolesApi } from '@/apis/modules/roles'
-import { useAsyncState } from '@vueuse/core'
 import {
   PlusOutlined,
   UndoOutlined,
@@ -29,6 +28,7 @@ import _ from 'lodash'
 import type { ColumnType } from 'ant-design-vue/es/table'
 import { useElementSize } from '@vueuse/core'
 import { commonDateFormatter } from '@/utils/time'
+import { useTable } from '@/hooks/use-table'
 
 defineOptions({
   name: 'role',
@@ -74,51 +74,27 @@ const columns: ColumnType[] = [
     align: 'center',
   },
 ]
-const defaultQueryOptions = {
-  showSizeChanger: true,
-  showQuickJumper: true,
-  total: 0,
-  showTotal: (total: number) => `共 ${total} 条`,
-  pageSize: 5,
-  current: 1,
-  keyWord: '',
-  pageSizeOptions: ['5', '10', '20', '50'],
-  async onChange(current: number, pageSize: number) {
-    this.current = current
-    this.pageSize = pageSize
-    await nextTick()
-    handleSearch()
-  },
-}
-const queryOptions = ref(_.cloneDeep(defaultQueryOptions))
-const queryParams = computed(() => {
-  return _.pick(queryOptions.value, ['keyWord', 'current', 'pageSize'])
+const conditions = ref({
+  name: '',
 })
-// const queryParams = ref(_.cloneDeep(defaultQueryParams))
-const { state, isLoading, execute } = useAsyncState(
-  RolesApi.getRoles,
-  {
-    list: [],
-    total: 0,
-  },
+watch(
+  conditions,
+  _.debounce(() => {
+    search()
+  }, 500),
   {
     immediate: false,
-    onSuccess(data){
-      queryOptions.value.total = data.total
-    }
+    deep: true,
   }
 )
-onMounted(() => {
-  handleSearch()
-})
-
-const handleSearch = () => {
-  execute(0, queryParams.value)
-}
-const handleReset = async () => {
- queryOptions.value = _.cloneDeep(defaultQueryOptions)
- await nextTick()
- handleSearch()
+const { tableState, search, isLoading, queryOptions } = useTable(
+  RolesApi.getRoles,
+  {
+    conditions,
+  }
+)
+const handleReset = () => {
+  conditions.value.name = ''
 }
 const isModalOpen = ref(false)
 const handleCreate = () => {
@@ -149,7 +125,7 @@ const create = async () => {
     message.success('创建成功')
     isModalOpen.value = false
     formRef.value?.resetFields()
-    handleSearch()
+    search()
   } catch (e) {
     console.error(e)
   } finally {
@@ -166,7 +142,7 @@ const patch = async () => {
     message.success('更新成功')
     isModalOpen.value = false
     formRef.value?.resetFields()
-    handleSearch()
+    search()
   } catch (e) {
     console.error(e)
   } finally {
@@ -179,7 +155,7 @@ const _delete = async () => {
     isDeleteLoading.value = true
     await RolesApi.deleteRole(id)
     message.success('删除成功')
-    handleSearch()
+    search()
   } catch (e) {
     console.error(e)
   } finally {
@@ -242,10 +218,10 @@ const aTableWrapperStyle = computed(() => {
     <!--- 搜索表单 --->
     <a-form ref="searchFormRef" layout="inline" class="mb-4 relative">
       <a-form-item label="角色名称">
-        <a-input v-model:value="queryOptions.keyWord" placeholder="请输入" />
+        <a-input v-model:value="conditions.name" placeholder="请输入" />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" @click="handleSearch">
+        <a-button type="primary" @click="search">
           <SearchOutlined />
           <span>查询</span>
         </a-button>
@@ -266,7 +242,7 @@ const aTableWrapperStyle = computed(() => {
     <section class="w-full" :style="aTableWrapperStyle">
       <a-table
         :columns="columns"
-        :data-source="state.list"
+        :data-source="tableState.list"
         :scroll="{
           x: '100%',
           y: 'max-content',

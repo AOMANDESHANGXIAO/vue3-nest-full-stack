@@ -8,21 +8,21 @@ import {
   Body,
   ParseUUIDPipe,
   Query,
-  ParseIntPipe,
   Request,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { RequireLogin } from 'src/decorators/custom-decorator';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { QueryRoleDto } from './dto/query-role.dto';
 import { Request as ExpressRequest } from 'express';
+import { Base64ToJsonParam } from 'src/decorators/param-decorators';
 
 @RequireLogin()
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
-  // 增删改查
   @Post()
   async create(
     @Body() createRoleDto: CreateRoleDto,
@@ -48,13 +48,10 @@ export class RolesController {
     return this.rolesService.update(id, updateRoleDto, req);
   }
 
-  @Get()
-  async findByPage(
-    @Query('pageSize', ParseIntPipe) pageSize: number,
-    @Query('current', ParseIntPipe) current: number,
-    @Query('keyWord') keyWord: string,
-  ) {
-    return this.rolesService.findByPage(pageSize, current, keyWord);
+  // TODO: refactor
+  @Get('page/:params')
+  async findByPage(@Base64ToJsonParam('params') params: QueryRoleDto) {
+    return this.rolesService.findByPage(params);
   }
 
   @Get('all')
