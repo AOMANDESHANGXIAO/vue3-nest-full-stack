@@ -1,5 +1,5 @@
 import { CreateRoleInterface } from '@v3-nest-full-stack/shared-types';
-import { IsString, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsArray } from 'class-validator';
 
 export class CreateRoleDto implements CreateRoleInterface {
   @IsNotEmpty()
@@ -11,4 +11,8 @@ export class CreateRoleDto implements CreateRoleInterface {
   @MaxLength(100)
   @IsString()
   desc: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  permissionIds: string[];
 }

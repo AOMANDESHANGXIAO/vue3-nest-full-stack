@@ -48,7 +48,6 @@ export class RolesController {
     return this.rolesService.update(id, updateRoleDto, req);
   }
 
-  // TODO: refactor
   @Get('page/:params')
   async findByPage(@Base64ToJsonParam('params') params: QueryRoleDto) {
     return this.rolesService.findByPage(params);

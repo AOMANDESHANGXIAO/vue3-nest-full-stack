@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
-import { Repository } from 'typeorm';
+import { Permission } from 'src/entities/permission.entity';
+import { In, Repository } from 'typeorm';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Request } from 'express';
@@ -18,6 +19,8 @@ export class RolesService {
   constructor(
     @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Permission)
+    private readonly permissionRepository: Repository<Permission>,
   ) {}
 
   async findAll(keyWord?: string): Promise<GetAllRolesResult> {
@@ -42,7 +45,8 @@ export class RolesService {
       .createQueryBuilder('role')
       .leftJoinAndSelect('role.createdBy', 'createdBy')
       .leftJoinAndSelect('role.updatedBy', 'updatedBy')
-      .where('role.status = :status', { status: true })
+      .leftJoinAndSelect('role.permissions', 'permissions')
+      .where('role.status = :status', { status: STATUS.ENABLE })
       .orderBy('role.createTime', 'DESC')
       .take(pageSize)
       .skip((current - 1) * pageSize);
@@ -61,8 +65,12 @@ export class RolesService {
 
   async create(createRoleDto: CreateRoleDto, req: Request) {
     const user = await this.userRepository.findOneBy({ id: req.user.uuid });
+    const permissions = await this.permissionRepository.find({
+      where: { id: In(createRoleDto.permissionIds) },
+    });
     await this.roleRepository.save({
       ...createRoleDto,
+      permissions,
       createdBy: user,
       updatedBy: user,
     });
@@ -73,9 +81,13 @@ export class RolesService {
     const role = await this.roleRepository.findOneBy({ id });
     if (!role) throw new Error('Role not found');
     const user = await this.userRepository.findOneBy({ id: req.user.uuid });
+    const permissions = await this.permissionRepository.find({
+      where: { id: In(updateRoleDto.permissionIds) },
+    });
     const newRole = await this.roleRepository.save({
       ...role,
       ...updateRoleDto,
+      permissions,
       updatedBy: user,
     });
     return newRole;

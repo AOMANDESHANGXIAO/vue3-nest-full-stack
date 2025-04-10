@@ -33,7 +33,7 @@ export class Role {
     type: 'tinyint',
     comment: '0:禁用 1:启用',
   })
-  status: number
+  status: number;
 
   @CreateDateColumn()
   createTime: Date;

@@ -93,6 +93,9 @@ const { tableState, search, isLoading, queryOptions } = useTable(
     conditions,
   }
 )
+onMounted(() => {
+  search()
+})
 const handleReset = () => {
   conditions.value.name = ''
 }
@@ -104,6 +107,7 @@ const handleCreate = () => {
 const formData = ref<CreateRoleInterface>({
   name: '',
   desc: '',
+  permissionIds: [],
 })
 const formRef = ref<FormInstance>()
 const rules: Record<string, Rule[]> = {
@@ -175,7 +179,7 @@ const handleDelete = (record: GetRoleListResult['list'][number]) => {
   id = record.id
   _delete()
 }
-const searchFormRef = useTemplateRef('searchFormRef')
+const searchFormRef = useTemplateRef<HTMLFormElement>('searchFormRef')
 const { height: searchFormHeight } = useElementSize(searchFormRef)
 const aTableWrapperStyle = computed(() => {
   return {

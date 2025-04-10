@@ -1,8 +1,9 @@
 export interface CreateRoleInterface {
   name: string
   desc: string
+  permissionIds?: string[]
 }
-export interface UpdateRoleInterface extends CreateRoleInterface {}
+export interface UpdateRoleInterface extends Partial<CreateRoleInterface> {}
 export interface RoleOperatorRecord {
   id: string
   status: number
@@ -21,6 +22,7 @@ export interface GetRoleListResult {
     updateTime: Date
     createdBy: RoleOperatorRecord
     updatedBy: RoleOperatorRecord
+    permissions: any[]
   }[]
   total: number
 }
