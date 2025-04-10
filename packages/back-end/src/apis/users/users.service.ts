@@ -102,32 +102,36 @@ export class UsersService {
       roleIds?: string[];
     },
   ): Promise<FindAllUsersApiResult> {
-    const where: any = {};
-    console.log('conditions', conditions);
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+    queryBuilder
+      .leftJoinAndSelect('user.roles', 'roles')
+      .take(pageSize)
+      .skip((current - 1) * pageSize);
     if (conditions) {
-      if (conditions?.username) {
-        where.username = Like(`%${conditions.username}%`);
+      if (conditions.username) {
+        queryBuilder.andWhere('user.username LIKE :username', {
+          username: `%${conditions.username}%`,
+        });
       }
-      if (conditions?.nickname) {
-        where.nickname = Like(`%${conditions.nickname}%`);
+      if (conditions.nickname) {
+        queryBuilder.andWhere('user.nickname LIKE :nickname', {
+          nickname: `%${conditions.nickname}%`,
+        });
       }
-      if (conditions?.status || conditions.status === STATUS.DISABLE) {
-        console.log('conditions.status', conditions.status);
-        where.status = conditions.status;
+      if (conditions.status || conditions.status === STATUS.DISABLE) {
+        queryBuilder.andWhere('user.status = :status', {
+          status: conditions.status,
+        });
       }
-      if (conditions?.roleIds) {
-        console.log('conditions.roleIds', conditions.roleIds);
-        where.roles = { id: In(conditions.roleIds) };
+      if (conditions.roleIds) {
+        queryBuilder.andWhere('roles.id IN (:...roleIds)', {
+          roleIds: conditions.roleIds,
+        });
       }
     }
-    const [users, total] = await this.userRepository.findAndCount({
-      where,
-      relations: ['roles'],
-      take: pageSize,
-      skip: (current - 1) * pageSize,
-    });
+    const [list, total] = await queryBuilder.getManyAndCount();
     return {
-      list: users,
+      list,
       total,
     };
   }
