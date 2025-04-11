@@ -10,15 +10,15 @@
 </route>
 
 <script setup lang="ts">
-import ContentContainer from "@/components/layouts/content-container.vue";
-import type { ColumnType } from "ant-design-vue/es/table";
-import { commonDateFormatter } from "@/utils/time";
-import { useAsyncState } from "@vueuse/core";
 import { DictsApi } from "@/apis/modules/dicts";
-import _ from "lodash";
-import { useElementSize } from "@vueuse/core";
-import { SearchOutlined, UndoOutlined } from "@ant-design/icons-vue";
+import ContentContainer from "@/components/layouts/content-container.vue";
 import { useDictStore } from "@/stores/modules/use-dict-store";
+import { commonDateFormatter } from "@/utils/time";
+import { SearchOutlined, UndoOutlined } from "@ant-design/icons-vue";
+import { useAsyncState } from "@vueuse/core";
+import { useElementSize } from "@vueuse/core";
+import type { ColumnType } from "ant-design-vue/es/table";
+import _ from "lodash";
 
 defineOptions({
   name: "dict",
@@ -60,7 +60,7 @@ onMounted(() => {
 });
 const { getDict } = useDictStore();
 
-const columns: ColumnType<any>[] = [
+const columns: ColumnType[] = [
   {
     title: "编码",
     dataIndex: "code",
@@ -145,14 +145,14 @@ onMounted(() => {
             v-model:value="searchFormModel.code"
             placeholder="请输入编码"
             allow-clear
-          />
+          ></a-input>
         </a-form-item>
         <a-form-item label="名称" name="name">
           <a-input
             v-model:value="searchFormModel.name"
             placeholder="请输入名称"
             allow-clear
-          />
+          ></a-input>
         </a-form-item>
         <a-form-item label="状态" name="status">
           <a-select
@@ -165,9 +165,11 @@ onMounted(() => {
         </a-form-item>
         <div class="absolute right-0 top-0 flex items-center gap-2">
           <a-button type="primary" @click="handleSearch">
-            <SearchOutlined /><span>查询</span></a-button
+            <SearchOutlined></SearchOutlined><span>查询</span></a-button
           >
-          <a-button @click=""> <UndoOutlined /><span>重置</span></a-button>
+          <a-button @click="">
+            <UndoOutlined></UndoOutlined><span>重置</span></a-button
+          >
         </div>
       </a-form>
     </div>

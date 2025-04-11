@@ -8,13 +8,15 @@
 </route>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import type { FormInstance } from 'ant-design-vue'
-import type { Rule } from 'ant-design-vue/es/form'
-import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-import { useUserStore } from '@/stores/modules/use-user-store'
-import { useRoute } from 'vue-router'
-import _ from 'lodash'
+import { useUserStore } from '@/stores/modules/use-user-store';
+import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
+import type { FormInstance } from 'ant-design-vue';
+import type { Rule } from 'ant-design-vue/es/form';
+import { Base64 } from 'js-base64';
+import _ from 'lodash';
+import { ref } from 'vue';
+import { useRoute } from 'vue-router';
+
 
 defineOptions({
   name: 'login',
@@ -23,9 +25,9 @@ defineOptions({
 const formRef = ref<FormInstance>()
 const rememberMe = ref(false)
 const route = useRoute()
-console.log('路由跳转', route.query.formState)
-const queryFormState = route.query.formState
-  ? (_.pick(JSON.parse(route.query.formState as string), [
+console.log('路由跳转', route.query.params)
+const queryFormState = route.query.params
+  ? (_.pick(JSON.parse(Base64.decode(route.query.params as string)), [
       'username',
       'password',
     ]) as FormState)
@@ -71,7 +73,7 @@ const handleFinish = async () => {
           placeholder="用户名"
         >
           <template #prefix>
-            <UserOutlined class="text-gray-400" />
+            <UserOutlined class="text-gray-400"></UserOutlined>
           </template>
         </a-input>
       </a-form-item>
@@ -83,7 +85,7 @@ const handleFinish = async () => {
           placeholder="密码"
         >
           <template #prefix>
-            <LockOutlined class="text-gray-400" />
+            <LockOutlined class="text-gray-400"></LockOutlined>
           </template>
         </a-input-password>
       </a-form-item>
@@ -100,7 +102,7 @@ const handleFinish = async () => {
         class="w-full"
         size="large"
       >
-        {{ userStore.isLoading ? '登录中...' : '登录' }}
+        {{ userStore.isLoading ? "登录中..." : "登录" }}
       </a-button>
     </a-form>
     <a-divider class="my-4"

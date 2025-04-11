@@ -10,33 +10,23 @@
 </route>
 
 <script lang="ts" setup>
-import ContentContainer from "@/components/layouts/content-container.vue";
+import { DictsApi } from "@/apis/modules/dicts";
+import { PermissionApi } from "@/apis/modules/permissions";
 import { RolesApi } from "@/apis/modules/roles";
-import {
-  PlusOutlined,
-  UndoOutlined,
-  SearchOutlined,
-} from "@ant-design/icons-vue";
-import {
-  type CreateRoleInterface,
-  type UpdateRoleInterface,
-  type GetRoleListResult,
-  type RoleOperatorRecord,
-  type QueryPermissionResult,
-  STATUS,
-} from "@v3-nest-full-stack/shared-types";
+import FormRenderer from "@/components/ant/form-renderer.vue";
+import ContentContainer from "@/components/layouts/content-container.vue";
+import { useTable } from "@/hooks/use-table";
+import { useDictStore } from "@/stores/modules/use-dict-store";
+import { commonDateFormatter } from "@/utils/time";
+import { PlusOutlined, UndoOutlined, SearchOutlined } from "@ant-design/icons-vue";
+import { type CreateRoleInterface, type UpdateRoleInterface, type GetRoleListResult, type RoleOperatorRecord, type QueryPermissionResult, STATUS } from "@v3-nest-full-stack/shared-types";
+import { useAsyncState } from "@vueuse/core";
+import { useElementSize } from "@vueuse/core";
 import { type FormInstance, Input, message, Select } from "ant-design-vue";
 import type { Rule } from "ant-design-vue/es/form";
-import _ from "lodash";
-import { useAsyncState } from "@vueuse/core";
 import type { ColumnType } from "ant-design-vue/es/table";
-import { useElementSize } from "@vueuse/core";
-import { commonDateFormatter } from "@/utils/time";
-import { useTable } from "@/hooks/use-table";
-import { PermissionApi } from "@/apis/modules/permissions";
-import FormRenderer from "@/components/ant/form-renderer.vue";
-import { useDictStore } from "@/stores/modules/use-dict-store";
-import { DictsApi } from "@/apis/modules/dicts";
+import _ from "lodash";
+
 
 const { getDict } = useDictStore();
 
@@ -361,27 +351,27 @@ const aTableWrapperStyle = computed(() => {
             ? createFormRendererItems
             : updateFormRendererItems
         "
-      />
+      ></FormRenderer>
     </a-modal>
 
     <!--- 搜索表单 --->
     <a-form ref="searchFormRef" layout="inline" class="mb-4 relative">
       <a-form-item label="角色名称">
-        <a-input v-model:value="conditions.name" placeholder="请输入" />
+        <a-input v-model:value="conditions.name" placeholder="请输入"></a-input>
       </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="search">
-          <SearchOutlined />
+          <SearchOutlined></SearchOutlined>
           <span>查询</span>
         </a-button>
         <a-button class="ml-2" @click="handleReset">
-          <UndoOutlined />
+          <UndoOutlined></UndoOutlined>
           <span>重置</span>
         </a-button>
       </a-form-item>
       <a-form-item class="absolute right-0">
         <a-button type="primary" class="ml-2" @click="handleCreate">
-          <PlusOutlined />
+          <PlusOutlined></PlusOutlined>
           <span>新增</span>
         </a-button>
       </a-form-item>

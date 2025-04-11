@@ -8,14 +8,16 @@
 </route>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import type { FormInstance } from 'ant-design-vue'
-import type { Rule } from 'ant-design-vue/es/form'
-import { UserOutlined, LockOutlined, EyeOutlined } from '@ant-design/icons-vue'
-import { UserApi } from '@/apis/modules/user'
-import { message } from 'ant-design-vue'
-import router from '@/routers'
-import _ from 'lodash'
+import { UserApi } from '@/apis/modules/user';
+import router from '@/routers';
+import { UserOutlined, LockOutlined, EyeOutlined } from '@ant-design/icons-vue';
+import type { FormInstance } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
+import type { Rule } from 'ant-design-vue/es/form';
+import _ from 'lodash';
+import { ref } from 'vue';
+
+import { Base64 } from 'js-base64';
 
 defineOptions({
   name: 'register',
@@ -23,17 +25,11 @@ defineOptions({
 
 const formRef = ref<FormInstance>()
 
-// const formState = ref({
-//   username: '',
-//   password: '',
-//   nickname: '',
-//   repassword: '',
-// })
 const formState = ref({
-  username: 'user_123',
-  password: '123abcABC',
-  nickname: '斌神',
-  repassword: '123abcABC',
+  username: '',
+  password: '',
+  nickname: '',
+  repassword: '',
 })
 
 const rules: Record<string, Rule[]> = {
@@ -93,7 +89,7 @@ const handleFinish = async () => {
     router.push({
       path: '/auth/login',
       query: {
-        formState: JSON.stringify(formState.value),
+        params: Base64.encode(JSON.stringify(formState.value)),
       },
     })
   } catch (error) {
@@ -122,7 +118,7 @@ const handleFinish = async () => {
           placeholder="账号"
         >
           <template #prefix>
-            <UserOutlined class="text-gray-400" />
+            <UserOutlined class="text-gray-400"></UserOutlined>
           </template>
         </a-input>
       </a-form-item>
@@ -134,7 +130,7 @@ const handleFinish = async () => {
           placeholder="昵称"
         >
           <template #prefix>
-            <UserOutlined class="text-gray-400" />
+            <UserOutlined class="text-gray-400"></UserOutlined>
           </template>
         </a-input>
       </a-form-item>
@@ -146,7 +142,7 @@ const handleFinish = async () => {
           placeholder="密码"
         >
           <template #prefix>
-            <EyeOutlined class="text-gray-400" />
+            <EyeOutlined class="text-gray-400"></EyeOutlined>
           </template>
         </a-input-password>
       </a-form-item>
@@ -158,7 +154,7 @@ const handleFinish = async () => {
           placeholder="确认密码"
         >
           <template #prefix>
-            <LockOutlined class="text-gray-400" />
+            <LockOutlined class="text-gray-400"></LockOutlined>
           </template>
         </a-input-password>
       </a-form-item>
@@ -170,7 +166,7 @@ const handleFinish = async () => {
         class="w-full"
         size="large"
       >
-        {{ loading ? '注册中...' : '注册' }}
+        {{ loading ? "注册中..." : "注册" }}
       </a-button>
     </a-form>
     <a-divider class="my-4"

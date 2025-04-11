@@ -1,18 +1,15 @@
 <script lang="ts" setup>
-import { useRoute, type RouteRecordRaw } from "vue-router";
-import { type MenuProps } from "ant-design-vue";
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  RedoOutlined,
-} from "@ant-design/icons-vue";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import _ from "lodash";
+import AppearenceSetting from "./appearence-setting.vue";
+import Bell from "@/components/ui/Bell.vue";
 import router, { routes } from "@/routers";
 import { useSystemConfigStore } from "@/stores/modules/use-system-config-store";
 import { useUserStore } from "@/stores/modules/use-user-store";
-import Bell from "@/components/ui/Bell.vue";
-import AppearenceSetting from "./appearence-setting.vue";
+import { MenuFoldOutlined, MenuUnfoldOutlined, RedoOutlined } from "@ant-design/icons-vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { type MenuProps } from "ant-design-vue";
+import _ from "lodash";
+import { useRoute, type RouteRecordRaw } from "vue-router";
+
 
 const userStore = useUserStore();
 await userStore.initUser();
@@ -124,7 +121,7 @@ const breadcrumbItems = computed(() => {
           <FontAwesomeIcon
             icon="graduation-cap"
             class="text-16px text-primary"
-          />
+          ></FontAwesomeIcon>
           <span class="text-16px" v-if="!systemConfig.collapsed">{{
             systemConfig.appTitle
           }}</span>
@@ -168,12 +165,12 @@ const breadcrumbItems = computed(() => {
           @click="open = false"
           icon="times"
           class="cursor-pointer"
-        />
+        ></FontAwesomeIcon>
       </header>
       <main class="box-border p-10px p-t-0" :class="['xb-drawer__main']">
         <a-tabs v-model:activeKey="activeSetting">
           <a-tab-pane key="appearance" tab="外观" class="text-16px">
-            <AppearenceSetting />
+            <AppearenceSetting></AppearenceSetting>
           </a-tab-pane>
           <a-tab-pane key="layout" tab="布局"></a-tab-pane>
           <a-tab-pane key="common" tab="通用"></a-tab-pane>
@@ -202,7 +199,7 @@ const breadcrumbItems = computed(() => {
             :is="systemConfig.collapsed ? MenuFoldOutlined : MenuUnfoldOutlined"
           ></component>
 
-          <RedoOutlined class="cursor-pointer" />
+          <RedoOutlined class="cursor-pointer"></RedoOutlined>
 
           <a-breadcrumb>
             <a-breadcrumb-item v-for="item in breadcrumbItems" :key="item">
@@ -239,7 +236,7 @@ const breadcrumbItems = computed(() => {
           ></FontAwesomeIcon>
 
           <!-- bell -->
-          <Bell />
+          <Bell></Bell>
 
           <a-space align="center" size="small">
             <a-avatar src="https://picsum.photos/seed/picsum/200/300"></a-avatar
@@ -265,7 +262,7 @@ const breadcrumbItems = computed(() => {
             <FontAwesomeIcon
               :icon="['fas', 'chevron-up']"
               class="cursor-pointer transform rotate-180 mr-10px"
-            />
+            ></FontAwesomeIcon>
             <template #overlay>
               <a-menu>
                 <a-menu-item
@@ -326,7 +323,7 @@ const breadcrumbItems = computed(() => {
             enter-active-class="animate__animated animate__fadeInRight"
           >
             <KeepAlive>
-              <component :is="Component" />
+              <component :is="Component"></component>
             </KeepAlive>
           </Transition>
         </RouterView>
