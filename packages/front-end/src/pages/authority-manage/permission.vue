@@ -10,22 +10,22 @@
 </route>
 
 <script setup lang="ts">
-import ContentContainer from "@/components/layouts/content-container.vue";
-import type { ColumnType } from "ant-design-vue/es/table";
-import { useTable } from "@/hooks/use-table";
-import { PermissionApi } from "@/apis/modules/permissions";
-import { useDictStore } from "@/stores/modules/use-dict-store";
 import { DictsApi } from "@/apis/modules/dicts";
+import { PermissionApi } from "@/apis/modules/permissions";
+import FormRenderer from "@/components/ant/form-renderer.vue";
+import ContentContainer from "@/components/layouts/content-container.vue";
+import { useTable } from "@/hooks/use-table";
+import { useDictStore } from "@/stores/modules/use-dict-store";
 import { commonDateFormatter } from "@/utils/time";
-import { useAsyncState } from "@vueuse/core";
-import _ from "lodash";
 import {
   PlusOutlined,
   UndoOutlined,
   SearchOutlined,
 } from "@ant-design/icons-vue";
-import FormRenderer from "@/components/ant/form-renderer.vue";
+import { useAsyncState, useElementSize } from "@vueuse/core";
 import { Input, message, Select } from "ant-design-vue";
+import type { ColumnType } from "ant-design-vue/es/table";
+import _ from "lodash";
 
 defineOptions({
   name: "permission",
@@ -94,18 +94,21 @@ const columns: ColumnType[] = [
     dataIndex: "action",
     key: "action",
     align: "center",
+    width: 150,
   },
 ];
 const conditions = ref({
   name: "",
   status: undefined,
 });
-const { tableState, queryOptions, search, isLoading } = useTable(
-  PermissionApi.getList,
-  {
+const { tableState, queryOptions, search, isLoading, computedColumns } =
+  useTable(PermissionApi.getList, {
     conditions,
-  }
-);
+    autoCalculateColumnWidth: {
+      enabled: true,
+      columns,
+    },
+  });
 watch(
   conditions,
   _.debounce(() => {
@@ -130,7 +133,7 @@ onMounted(() => {
 });
 const {
   execute,
-  state: statusSelectList,
+  state: statusState,
   isLoading: fetchStatusLoading,
 } = useAsyncState(
   DictsApi.getSelectableDictList,
@@ -162,7 +165,7 @@ const formRules = {
   ],
   desc: [{ max: 200, message: "描述最多200个字符" }],
 };
-const createFormItems = ref([
+const createFormItems = [
   {
     key: "name",
     label: "权限名称",
@@ -175,9 +178,9 @@ const createFormItems = ref([
     name: "desc",
     component: Input,
   },
-]);
-const updateFormItems = ref([
-  ...createFormItems.value,
+];
+const updateFormItems = [
+  ...createFormItems,
   {
     key: "status",
     label: "状态",
@@ -185,10 +188,10 @@ const updateFormItems = ref([
     component: Select,
     attrs: () => ({
       placeholder: "请选择状态",
-      options: statusSelectList.value.list,
+      options: statusState.value.list,
     }),
   },
-]);
+];
 const handleClickAdd = () => {
   isFormModalOpen.value = true;
   formModalStatus.value = "create";
@@ -277,6 +280,18 @@ const _delete = (record: any) => {
       isDeleteLoading.value = false;
     });
 };
+const searchFormContainerRef = useTemplateRef<HTMLDivElement>(
+  "searchFormContainerRef"
+);
+const { height: searchFormContainerHeight } = useElementSize(
+  searchFormContainerRef
+);
+const aTableContainerStyle = computed(() => {
+  return {
+    height: `calc(100% - ${searchFormContainerHeight.value}px - 30px)`,
+    width: "100%",
+  };
+});
 </script>
 
 <template>
@@ -308,7 +323,8 @@ const _delete = (record: any) => {
         </a-button>
       </template>
     </a-modal>
-    <section>
+
+    <section ref="searchFormContainerRef">
       <a-form layout="inline" class="mb-4">
         <div class="flex flex-wrap gap-4">
           <a-form-item label="权限名称">
@@ -321,7 +337,7 @@ const _delete = (record: any) => {
             <a-select
               v-model:value="conditions.status"
               placeholder="请选择状态"
-              :options="statusSelectList.list"
+              :options="statusState.list"
               :loading="fetchStatusLoading"
               :style="{
                 width: '200px',
@@ -333,27 +349,28 @@ const _delete = (record: any) => {
       </a-form>
       <div class="flex flex-wrap gap-4 mb-4">
         <a-button type="primary" @click="handleSearch">
-          <SearchOutlined />
+          <SearchOutlined></SearchOutlined>
           <span class="ml-2">搜索</span>
         </a-button>
         <a-button @click="handleReset">
-          <UndoOutlined />
+          <UndoOutlined></UndoOutlined>
           <span class="ml-2">重置</span>
         </a-button>
         <a-button type="primary" @click="handleClickAdd">
-          <PlusOutlined />
+          <PlusOutlined></PlusOutlined>
           <span class="ml-2">新增</span>
         </a-button>
       </div>
     </section>
-    <section class="w-full">
+
+    <section :style="aTableContainerStyle">
       <a-table
-        :columns="columns"
+        :columns="computedColumns"
         :data-source="tableState.list"
         :pagination="queryOptions"
         :loading="isLoading"
         :rowKey="(record) => record.id"
-        :scroll="{ y: 'max-content' }"
+        :scroll="{ y: 'max-content', x: '100%' }"
         :bordered="false"
       >
         <template #bodyCell="{ column, record }">

@@ -341,7 +341,9 @@ const aTableWrapperStyle = computed(() => {
       :confirm-loading="isConfirmLoading"
       @ok="handleSubmit"
     >
-      <template #title>新增角色</template>
+      <template #title>
+        {{ formStatus === "create" ? "新增角色" : "编辑角色" }}
+      </template>
       <FormRenderer
         v-if="isModalOpen"
         :model="formStatus === 'create' ? createFormData : updateFormData"
