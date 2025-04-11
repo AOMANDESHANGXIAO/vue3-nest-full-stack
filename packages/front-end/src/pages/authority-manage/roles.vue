@@ -17,12 +17,13 @@ import {
   UndoOutlined,
   SearchOutlined,
 } from "@ant-design/icons-vue";
-import type {
-  CreateRoleInterface,
-  UpdateRoleInterface,
-  GetRoleListResult,
-  RoleOperatorRecord,
-  QueryPermissionResult,
+import {
+  type CreateRoleInterface,
+  type UpdateRoleInterface,
+  type GetRoleListResult,
+  type RoleOperatorRecord,
+  type QueryPermissionResult,
+  STATUS,
 } from "@v3-nest-full-stack/shared-types";
 import { type FormInstance, Input, message, Select } from "ant-design-vue";
 import type { Rule } from "ant-design-vue/es/form";
@@ -34,6 +35,10 @@ import { commonDateFormatter } from "@/utils/time";
 import { useTable } from "@/hooks/use-table";
 import { PermissionApi } from "@/apis/modules/permissions";
 import FormRenderer from "@/components/ant/form-renderer.vue";
+import { useDictStore } from "@/stores/modules/use-dict-store";
+import { DictsApi } from "@/apis/modules/dicts";
+
+const { getDict } = useDictStore();
 
 defineOptions({
   name: "role",
@@ -44,6 +49,13 @@ const columns: ColumnType[] = [
     dataIndex: "name",
     key: "name",
     align: "center",
+  },
+  {
+    title: "状态",
+    dataIndex: "status",
+    key: "status",
+    align: "center",
+    customRender: ({ text }) => getDict("status", text),
   },
   {
     title: "描述",
@@ -133,8 +145,9 @@ const updateFormData = ref<UpdateRoleInterface>({
   name: "",
   desc: "",
   permissionIds: [],
+  status: STATUS.ENABLE,
 });
-const formRendererItems = computed(() => [
+const createFormRendererItems = [
   {
     key: "name",
     label: "角色名称",
@@ -165,7 +178,62 @@ const formRendererItems = computed(() => [
       };
     },
   },
-]);
+];
+const { state: statusList, execute: fetchStatusList } = useAsyncState(
+  DictsApi.getSelectableDictList,
+  {
+    list: [],
+  },
+  {
+    immediate: false,
+  }
+);
+onMounted(() => {
+  fetchStatusList(0, "status");
+});
+const updateFormRendererItems = [
+  {
+    key: "name",
+    label: "角色名称",
+    name: "name",
+    component: Input,
+  },
+  {
+    key: "desc",
+    label: "描述",
+    name: "desc",
+    component: Input.TextArea,
+  },
+  {
+    key: "permissionIds",
+    label: "权限",
+    name: "permissionIds",
+    component: Select,
+    attrs: () => {
+      return {
+        mode: "multiple",
+        options: permissions.value.map((item) => ({
+          label: item.name,
+          value: item.id,
+        })),
+        onPopupScroll: () => {
+          fetchPagedPermissions(0, fetchPermissionsParmas.value);
+        },
+      };
+    },
+  },
+  {
+    key: "status",
+    label: "状态",
+    name: "status",
+    component: Select,
+    attrs: () => {
+      return {
+        options: statusList.value.list,
+      };
+    },
+  },
+];
 const permissions = ref<QueryPermissionResult["list"]>([]);
 const fetchPermissionsParmas = ref({
   current: 1,
@@ -254,6 +322,7 @@ const handleUpdate = (record: GetRoleListResult["list"][number]) => {
     name: record.name,
     desc: record.desc,
     permissionIds: record.permissions.map((item) => item.id),
+    status: record.status,
   };
   isModalOpen.value = true;
 };
@@ -284,7 +353,11 @@ const aTableWrapperStyle = computed(() => {
         v-if="isModalOpen"
         :model="formStatus === 'create' ? createFormData : updateFormData"
         :rules="rules"
-        :items="formRendererItems"
+        :items="
+          formStatus === 'create'
+            ? createFormRendererItems
+            : updateFormRendererItems
+        "
       />
     </a-modal>
 

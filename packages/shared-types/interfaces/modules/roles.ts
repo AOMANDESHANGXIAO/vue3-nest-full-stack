@@ -3,7 +3,9 @@ export interface CreateRoleInterface {
   desc: string
   permissionIds?: string[]
 }
-export interface UpdateRoleInterface extends Partial<CreateRoleInterface> {}
+export interface UpdateRoleInterface extends Partial<CreateRoleInterface> {
+  status?: number
+}
 export interface RoleOperatorRecord {
   id: string
   status: number

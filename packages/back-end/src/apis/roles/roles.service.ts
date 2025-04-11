@@ -34,7 +34,6 @@ export class RolesService {
         'permissions.status = :status',
         { status: STATUS.ENABLE },
       )
-      .where('role.status = :status', { status: STATUS.ENABLE })
       .orderBy('role.createTime', 'DESC');
 
     if (keyWord) {
@@ -57,7 +56,6 @@ export class RolesService {
         'permissions.status = :status',
         { status: STATUS.ENABLE },
       )
-      .where('role.status = :status', { status: STATUS.ENABLE })
       .orderBy('role.createTime', 'DESC')
       .take(pageSize)
       .skip((current - 1) * pageSize);
