@@ -4,7 +4,7 @@
     "title": "角色",
     "menuOrder": 1,
     "showInMenu": true,
-    "breadcrumbName": "角色"
+    "breadcrumbName": ["权限管理", "角色"]
   }
 }
 </route>
@@ -173,13 +173,13 @@ const createFormRendererItems = [
           value: item.id,
         })),
         onPopupScroll: () => {
-          fetchPagedPermissions(0, fetchPermissionsParmas.value);
+          fetchPagedPermissions(0, fetchPermissionsParmas);
         },
       };
     },
   },
 ];
-const { state: statusList, execute: fetchStatusList } = useAsyncState(
+const { state: statusState, execute: fetchstatusState } = useAsyncState(
   DictsApi.getSelectableDictList,
   {
     list: [],
@@ -189,7 +189,7 @@ const { state: statusList, execute: fetchStatusList } = useAsyncState(
   }
 );
 onMounted(() => {
-  fetchStatusList(0, "status");
+  fetchstatusState(0, "status");
 });
 const updateFormRendererItems = [
   {
@@ -217,7 +217,7 @@ const updateFormRendererItems = [
           value: item.id,
         })),
         onPopupScroll: () => {
-          fetchPagedPermissions(0, fetchPermissionsParmas.value);
+          fetchPagedPermissions(0, fetchPermissionsParmas);
         },
       };
     },
@@ -229,16 +229,19 @@ const updateFormRendererItems = [
     component: Select,
     attrs: () => {
       return {
-        options: statusList.value.list,
+        options: statusState.value.list,
       };
     },
   },
 ];
 const permissions = ref<QueryPermissionResult["list"]>([]);
-const fetchPermissionsParmas = ref({
+const fetchPermissionsParmas = {
   current: 1,
   pageSize: 10,
-});
+  conditions: {
+    status: STATUS.ENABLE,
+  }
+};
 const { execute: fetchPagedPermissions } = useAsyncState(
   PermissionApi.getList,
   {
@@ -249,12 +252,12 @@ const { execute: fetchPagedPermissions } = useAsyncState(
     immediate: false,
     onSuccess(data) {
       permissions.value = permissions.value.concat(data.list);
-      fetchPermissionsParmas.value.current += 1;
+      fetchPermissionsParmas.current += 1;
     },
   }
 );
 onMounted(() => {
-  fetchPagedPermissions(0, fetchPermissionsParmas.value);
+  fetchPagedPermissions(0, fetchPermissionsParmas);
 });
 
 const formRef = ref<FormInstance>();

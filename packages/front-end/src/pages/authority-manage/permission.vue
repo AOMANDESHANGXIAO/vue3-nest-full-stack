@@ -4,7 +4,7 @@
     "title": "权限",
     "menuOrder": 3,
     "showInMenu": true,
-    "breadcrumbName": "权限"
+    "breadcrumbName": ["权限管理", "权限"]
   }
 }
 </route>
@@ -187,7 +187,6 @@ const updateFormItems = ref([
       placeholder: "请选择状态",
       options: statusSelectList.value.list,
     }),
-
   },
 ]);
 const handleClickAdd = () => {

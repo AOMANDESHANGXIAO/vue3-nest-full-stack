@@ -1,29 +1,29 @@
 <script lang="ts" setup>
-import type { RouteRecordRaw } from 'vue-router'
-import type { MenuProps } from 'ant-design-vue'
+import { useRoute, type RouteRecordRaw } from "vue-router";
+import type { MenuProps } from "ant-design-vue";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   RedoOutlined,
-} from '@ant-design/icons-vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import _ from 'lodash'
-import router, { routes } from '@/routers'
-import { useSystemConfigStore } from '@/stores/modules/use-system-config-store'
-import { useUserStore } from '@/stores/modules/use-user-store'
-import Bell from '@/components/ui/Bell.vue'
-import AppearenceSetting from './appearence-setting.vue'
+} from "@ant-design/icons-vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import _ from "lodash";
+import router, { routes } from "@/routers";
+import { useSystemConfigStore } from "@/stores/modules/use-system-config-store";
+import { useUserStore } from "@/stores/modules/use-user-store";
+import Bell from "@/components/ui/Bell.vue";
+import AppearenceSetting from "./appearence-setting.vue";
 
-const userStore = useUserStore()
-await userStore.initUser()
-const systemConfigStore = useSystemConfigStore()
+const userStore = useUserStore();
+await userStore.initUser();
+const systemConfigStore = useSystemConfigStore();
 const { toggleCollapsed, toggleColorMode, addSelectedKeyHistory } =
-  systemConfigStore
-const systemConfig = toRef(systemConfigStore.config)
+  systemConfigStore;
+const systemConfig = toRef(systemConfigStore.config);
 const transformRouteToMenu = (route: RouteRecordRaw) => {
-  const meta = route.meta
+  const meta = route.meta;
   if (!meta || !meta.showInMenu) {
-    return void 0
+    return void 0;
   }
   if (!meta.icon) {
     return {
@@ -32,7 +32,7 @@ const transformRouteToMenu = (route: RouteRecordRaw) => {
       title: meta!.title,
       // In fact, the generated `route.name` represents the complete path, rather than `route.path`.
       path: route.name,
-    }
+    };
   }
   return {
     key: route.name,
@@ -41,61 +41,69 @@ const transformRouteToMenu = (route: RouteRecordRaw) => {
     title: meta!.title,
     path: route.name,
     iconName: meta!.icon,
-  }
-}
+  };
+};
 
-const mapRouteToMenu = (routes: RouteRecordRaw[]): MenuProps['items'] => {
-  const routes_ = _.cloneDeep(routes)
-  return _.sortBy(routes_, route => {
-    return route.meta?.menuOrder || 0
+const mapRouteToMenu = (routes: RouteRecordRaw[]): MenuProps["items"] => {
+  const routes_ = _.cloneDeep(routes);
+  return _.sortBy(routes_, (route) => {
+    return route.meta?.menuOrder || 0;
   }).map((route: RouteRecordRaw) => {
     if (route.children) {
       return {
         ...transformRouteToMenu(route),
         children: route.children ? mapRouteToMenu(route.children) : [],
-      }
+      };
     }
-    return transformRouteToMenu(route) as MenuProps['items']
-  }) as MenuProps['items']
-}
-const items = mapRouteToMenu(routes)?.filter(item => item?.key)
-console.log('items', items)
+    return transformRouteToMenu(route) as MenuProps["items"];
+  }) as MenuProps["items"];
+};
+const items = mapRouteToMenu(routes)?.filter((item) => item?.key);
+console.log("items", items);
 const menuStyle = computed(() => {
   return {
     flex: 1,
-    'min-width': systemConfig.value.collapsed ? '30px' : '200px',
-  }
-})
+    "min-width": systemConfig.value.collapsed ? "30px" : "200px",
+  };
+});
 // The type, e.g,MenuProps['onClick'], provided by ant-design-vue is not correct.
 // So that, I use any here.
 const handleMenuClick = (e: any) => {
-  if (!e || !e.item.originItemValue.path) return
+  if (!e || !e.item.originItemValue.path) return;
 
   addSelectedKeyHistory({
     key: e.key,
     path: e.item.originItemValue.path,
     title: e.item.originItemValue.title,
     icon: e.item.originItemValue.iconName,
-  })
+  });
   router.push({
     path: e.item.originItemValue.path,
     replace: true,
-  })
-}
+  });
+};
 const handleClickTab = ({ path }: { path: string }) => {
-  router.push(path)
-}
-const open = ref(false)
+  router.push(path);
+};
+const open = ref(false);
 const handleClickSetting = () => {
-  open.value = !open.value
-}
+  open.value = !open.value;
+};
 
-const activeSetting = ref('appearance')
+const activeSetting = ref("appearance");
 
 const handleClickLogout = () => {
-  userStore.logout()
-  systemConfigStore.removeCache()
-}
+  userStore.logout();
+  systemConfigStore.removeCache();
+};
+const route = useRoute();
+const breadcrumbItems = computed(() => {
+  const meta = route.meta;
+  if (!meta) {
+    return [];
+  }
+  return meta.breadcrumbName as string[];
+});
 </script>
 
 <template>
@@ -117,9 +125,9 @@ const handleClickLogout = () => {
             icon="graduation-cap"
             class="text-16px text-primary"
           />
-          <span class="text-16px" v-if="!systemConfig.collapsed"
-            >{{ systemConfig.appTitle }}</span
-          >
+          <span class="text-16px" v-if="!systemConfig.collapsed">{{
+            systemConfig.appTitle
+          }}</span>
         </a-space>
       </header>
       <section
@@ -175,7 +183,9 @@ const handleClickLogout = () => {
         class="box-border p-10px absolute bottom-0 w-full"
         :class="['xb-drawer__footer']"
       >
-        <a-button class="w-100%" @click="handleClickLogout">清空缓存&退出登录</a-button>
+        <a-button class="w-100%" @click="handleClickLogout"
+          >清空缓存&退出登录</a-button
+        >
       </footer>
     </a-drawer>
 
@@ -192,6 +202,15 @@ const handleClickLogout = () => {
             :is="systemConfig.collapsed ? MenuFoldOutlined : MenuUnfoldOutlined"
           ></component>
           <RedoOutlined class="cursor-pointer" />
+          <!-- TODO: 面包屑 -->
+          <a-breadcrumb>
+            <a-breadcrumb-item
+              v-for="(item) in breadcrumbItems"
+              :key="item"
+            >
+            {{ item }}
+            </a-breadcrumb-item>
+          </a-breadcrumb>
         </div>
 
         <a-space size="large">

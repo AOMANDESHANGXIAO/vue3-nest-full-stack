@@ -5,7 +5,7 @@
     "icon": "database",
     "menuOrder": 4,
     "showInMenu": true,
-    "breadcrumbName": "数据管理"
+    "breadcrumbName": ["数据管理"]
   }
 }
 </route>

@@ -5,7 +5,7 @@
     "icon": "home",
     "menuOrder": 1,
     "showInMenu": true,
-    "breadcrumbName": "首页"
+    "breadcrumbName": ["首页"]
   }
 }
 </route>

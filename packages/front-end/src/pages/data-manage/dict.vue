@@ -4,7 +4,7 @@
     "title": "字典",
     "menuOrder": 1,
     "showInMenu": true,
-    "breadcrumbName": "字典"
+    "breadcrumbName": ["数据管理", "字典"]
   }
 }
 </route>

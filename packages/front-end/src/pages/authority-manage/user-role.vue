@@ -4,7 +4,7 @@
     "title": "用户",
     "menuOrder": 2,
     "showInMenu": true,
-    "breadcrumbName": "用户"
+    "breadcrumbName": ["权限管理", "用户"]
   }
 }
 </route>
