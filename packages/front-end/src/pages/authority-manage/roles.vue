@@ -10,182 +10,264 @@
 </route>
 
 <script lang="ts" setup>
-import ContentContainer from '@/components/layouts/content-container.vue'
-import { RolesApi } from '@/apis/modules/roles'
+import ContentContainer from "@/components/layouts/content-container.vue";
+import { RolesApi } from "@/apis/modules/roles";
 import {
   PlusOutlined,
   UndoOutlined,
   SearchOutlined,
-} from '@ant-design/icons-vue'
+} from "@ant-design/icons-vue";
 import type {
   CreateRoleInterface,
+  UpdateRoleInterface,
   GetRoleListResult,
   RoleOperatorRecord,
-} from '@v3-nest-full-stack/shared-types'
-import { type FormInstance, message } from 'ant-design-vue'
-import type { Rule } from 'ant-design-vue/es/form'
-import _ from 'lodash'
-import type { ColumnType } from 'ant-design-vue/es/table'
-import { useElementSize } from '@vueuse/core'
-import { commonDateFormatter } from '@/utils/time'
-import { useTable } from '@/hooks/use-table'
+  QueryPermissionResult,
+} from "@v3-nest-full-stack/shared-types";
+import { type FormInstance, Input, message, Select } from "ant-design-vue";
+import type { Rule } from "ant-design-vue/es/form";
+import _ from "lodash";
+import { useAsyncState } from "@vueuse/core";
+import type { ColumnType } from "ant-design-vue/es/table";
+import { useElementSize } from "@vueuse/core";
+import { commonDateFormatter } from "@/utils/time";
+import { useTable } from "@/hooks/use-table";
+import { PermissionApi } from "@/apis/modules/permissions";
+import FormRenderer from "@/components/ant/form-renderer.vue";
 
 defineOptions({
-  name: 'role',
-})
+  name: "role",
+});
 const columns: ColumnType[] = [
   {
-    title: '角色名称',
-    dataIndex: 'name',
-    key: 'name',
-    align: 'center',
+    title: "角色名称",
+    dataIndex: "name",
+    key: "name",
+    align: "center",
   },
   {
-    title: '描述',
-    dataIndex: 'desc',
-    key: 'desc',
-    align: 'center',
+    title: "描述",
+    dataIndex: "desc",
+    key: "desc",
+    align: "center",
   },
   {
-    title: '创建时间',
-    dataIndex: 'createTime',
-    key: 'createTime',
-    align: 'center',
+    title: "权限",
+    dataIndex: "permissions",
+    key: "permissions",
+    align: "center",
+    customRender: ({ text }) =>
+      text
+        .map(
+          (item: GetRoleListResult["list"][number]["permissions"][number]) =>
+            item.name
+        )
+        .join(",") || "--",
+  },
+  {
+    title: "创建时间",
+    dataIndex: "createTime",
+    key: "createTime",
+    align: "center",
     customRender: ({ text }) => commonDateFormatter(text),
   },
   {
-    title: '创建人',
-    dataIndex: ['createdBy', 'username'],
-    key: 'createdBy',
+    title: "创建人",
+    dataIndex: ["createdBy", "username"],
+    key: "createdBy",
     customRender: ({
       record,
     }: {
       record: {
-        createdBy: RoleOperatorRecord
-      }
+        createdBy: RoleOperatorRecord;
+      };
     }) => record.createdBy.username,
-    align: 'center',
+    align: "center",
   },
   {
-    title: '操作',
-    dataIndex: 'action',
-    key: 'action',
+    title: "操作",
+    dataIndex: "action",
+    key: "action",
     width: 150,
-    align: 'center',
+    align: "center",
   },
-]
+];
 const conditions = ref({
-  name: '',
-})
+  name: "",
+});
 watch(
   conditions,
   _.debounce(() => {
-    search()
+    search();
   }, 500),
   {
     immediate: false,
     deep: true,
   }
-)
+);
 const { tableState, search, isLoading, queryOptions } = useTable(
   RolesApi.getRoles,
   {
     conditions,
   }
-)
+);
 onMounted(() => {
-  search()
-})
+  search();
+});
 const handleReset = () => {
-  conditions.value.name = ''
-}
-const isModalOpen = ref(false)
+  conditions.value.name = "";
+};
+const isModalOpen = ref(false);
+const formStatus = ref<"create" | "update">("create");
 const handleCreate = () => {
-  handleSubmit = create
-  isModalOpen.value = true
-}
-const formData = ref<CreateRoleInterface>({
-  name: '',
-  desc: '',
+  handleSubmit = create;
+  isModalOpen.value = true;
+  formStatus.value = "create";
+};
+const createFormData = ref<CreateRoleInterface>({
+  name: "",
+  desc: "",
   permissionIds: [],
-})
-const formRef = ref<FormInstance>()
+});
+const updateFormData = ref<UpdateRoleInterface>({
+  name: "",
+  desc: "",
+  permissionIds: [],
+});
+const formRendererItems = computed(() => [
+  {
+    key: "name",
+    label: "角色名称",
+    name: "name",
+    component: Input,
+  },
+  {
+    key: "desc",
+    label: "描述",
+    name: "desc",
+    component: Input.TextArea,
+  },
+  {
+    key: "permissionIds",
+    label: "权限",
+    name: "permissionIds",
+    component: Select,
+    attrs: () => {
+      return {
+        mode: "multiple",
+        options: permissions.value.map((item) => ({
+          label: item.name,
+          value: item.id,
+        })),
+        onPopupScroll: () => {
+          fetchPagedPermissions(0, fetchPermissionsParmas.value);
+        },
+      };
+    },
+  },
+]);
+const permissions = ref<QueryPermissionResult["list"]>([]);
+const fetchPermissionsParmas = ref({
+  current: 1,
+  pageSize: 10,
+});
+const { execute: fetchPagedPermissions } = useAsyncState(
+  PermissionApi.getList,
+  {
+    list: [],
+    total: 0,
+  },
+  {
+    immediate: false,
+    onSuccess(data) {
+      permissions.value = permissions.value.concat(data.list);
+      fetchPermissionsParmas.value.current += 1;
+    },
+  }
+);
+onMounted(() => {
+  fetchPagedPermissions(0, fetchPermissionsParmas.value);
+});
+
+const formRef = ref<FormInstance>();
 const rules: Record<string, Rule[]> = {
   name: [
-    { required: true, message: '角色名称不能为空', trigger: 'blur' },
-    { max: 50, message: '名称长度不能超过50个字符', trigger: 'blur' },
+    { required: true, message: "角色名称不能为空", trigger: "blur" },
+    { max: 50, message: "名称长度不能超过50个字符", trigger: "blur" },
   ],
   desc: [
-    { required: true, message: '角色描述不能为空', trigger: 'blur' },
-    { max: 200, message: '描述长度不能超过200个字符', trigger: 'blur' },
+    { required: true, message: "角色描述不能为空", trigger: "blur" },
+    { max: 200, message: "描述长度不能超过200个字符", trigger: "blur" },
   ],
-}
-const isConfirmLoading = ref(false)
+};
+const isConfirmLoading = ref(false);
 const create = async () => {
   try {
-    isConfirmLoading.value = true
-    await formRef.value?.validate()
-    await RolesApi.createRole(formData.value)
-    message.success('创建成功')
-    isModalOpen.value = false
-    formRef.value?.resetFields()
-    search()
+    isConfirmLoading.value = true;
+    await formRef.value?.validate();
+    await RolesApi.createRole(createFormData.value);
+    message.success("创建成功");
+    isModalOpen.value = false;
+    formRef.value?.resetFields();
+    search();
   } catch (e) {
-    console.error(e)
+    console.error(e);
   } finally {
-    isConfirmLoading.value = false
+    isConfirmLoading.value = false;
   }
-}
-let handleSubmit = create
-let id = ''
+};
+let handleSubmit = create;
+let id = "";
 const patch = async () => {
   try {
-    isConfirmLoading.value = true
-    await formRef.value?.validate()
-    await RolesApi.updateRole(id, formData.value)
-    message.success('更新成功')
-    isModalOpen.value = false
-    formRef.value?.resetFields()
-    search()
+    isConfirmLoading.value = true;
+    await formRef.value?.validate();
+    await RolesApi.updateRole(id, updateFormData.value);
+    message.success("更新成功");
+    isModalOpen.value = false;
+    formRef.value?.resetFields();
+    search();
   } catch (e) {
-    console.error(e)
+    console.error(e);
   } finally {
-    isConfirmLoading.value = false
+    isConfirmLoading.value = false;
   }
-}
-const isDeleteLoading = ref(false)
+};
+const isDeleteLoading = ref(false);
 const _delete = async () => {
   try {
-    isDeleteLoading.value = true
-    await RolesApi.deleteRole(id)
-    message.success('删除成功')
-    search()
+    isDeleteLoading.value = true;
+    await RolesApi.deleteRole(id);
+    message.success("删除成功");
+    search();
   } catch (e) {
-    console.error(e)
+    console.error(e);
   } finally {
-    isDeleteLoading.value = false
+    isDeleteLoading.value = false;
   }
-}
-const handleEdit = (record: GetRoleListResult['list'][number]) => {
-  id = record.id
-  handleSubmit = patch
-  formData.value = {
+};
+const handleUpdate = (record: GetRoleListResult["list"][number]) => {
+  id = record.id;
+  formStatus.value = "update";
+  handleSubmit = patch;
+  updateFormData.value = {
     name: record.name,
     desc: record.desc,
-  }
-  isModalOpen.value = true
-}
-const handleDelete = (record: GetRoleListResult['list'][number]) => {
-  id = record.id
-  _delete()
-}
-const searchFormRef = useTemplateRef<HTMLFormElement>('searchFormRef')
-const { height: searchFormHeight } = useElementSize(searchFormRef)
+    permissionIds: record.permissions.map((item) => item.id),
+  };
+  isModalOpen.value = true;
+};
+const handleDelete = (record: GetRoleListResult["list"][number]) => {
+  id = record.id;
+  _delete();
+};
+const searchFormRef = useTemplateRef<HTMLFormElement>("searchFormRef");
+const { height: searchFormHeight } = useElementSize(searchFormRef);
 const aTableWrapperStyle = computed(() => {
   return {
     height: `100% - ${searchFormHeight.value}px - 30px`,
-  }
-})
+  };
+});
 </script>
 
 <template>
@@ -198,25 +280,12 @@ const aTableWrapperStyle = computed(() => {
       @ok="handleSubmit"
     >
       <template #title>新增角色</template>
-      <a-form
-        layout="horizontal"
-        :model="formData"
-        ref="formRef"
+      <FormRenderer
+        v-if="isModalOpen"
+        :model="formStatus === 'create' ? createFormData : updateFormData"
         :rules="rules"
-      >
-        <a-row :gutter="10">
-          <a-col :span="12">
-            <a-form-item label="角色名称" name="name">
-              <a-input v-model:value="formData.name" placeholder="请输入" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="描述" name="desc">
-              <a-textarea v-model:value="formData.desc" placeholder="请输入" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-form>
+        :items="formRendererItems"
+      />
     </a-modal>
 
     <!--- 搜索表单 --->
@@ -263,7 +332,9 @@ const aTableWrapperStyle = computed(() => {
               <a-button
                 type="primary"
                 class="mr-2"
-                @click="handleEdit(record as GetRoleListResult['list'][number])"
+                @click="
+                  handleUpdate(record as GetRoleListResult['list'][number])
+                "
               >
                 编辑</a-button
               >
@@ -286,5 +357,5 @@ const aTableWrapperStyle = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-@import url('@/styles/a-table.scss');
+@import url("@/styles/a-table.scss");
 </style>
