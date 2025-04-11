@@ -28,7 +28,13 @@ export class RolesService {
       .createQueryBuilder('role')
       .leftJoinAndSelect('role.createdBy', 'createdBy')
       .leftJoinAndSelect('role.updatedBy', 'updatedBy')
-      .where('role.status = :status', { status: true })
+      .leftJoinAndSelect(
+        'role.permissions',
+        'permissions',
+        'permissions.status = :status',
+        { status: STATUS.ENABLE },
+      )
+      .where('role.status = :status', { status: STATUS.ENABLE })
       .orderBy('role.createTime', 'DESC');
 
     if (keyWord) {
@@ -45,7 +51,12 @@ export class RolesService {
       .createQueryBuilder('role')
       .leftJoinAndSelect('role.createdBy', 'createdBy')
       .leftJoinAndSelect('role.updatedBy', 'updatedBy')
-      .leftJoinAndSelect('role.permissions', 'permissions')
+      .leftJoinAndSelect(
+        'role.permissions',
+        'permissions',
+        'permissions.status = :status',
+        { status: STATUS.ENABLE },
+      )
       .where('role.status = :status', { status: STATUS.ENABLE })
       .orderBy('role.createTime', 'DESC')
       .take(pageSize)
