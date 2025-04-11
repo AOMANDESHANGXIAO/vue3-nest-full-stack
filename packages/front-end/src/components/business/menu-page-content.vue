@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useRoute, type RouteRecordRaw } from "vue-router";
-import type { MenuProps } from "ant-design-vue";
+import { type MenuProps } from "ant-design-vue";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -201,14 +201,12 @@ const breadcrumbItems = computed(() => {
             class="text-16px"
             :is="systemConfig.collapsed ? MenuFoldOutlined : MenuUnfoldOutlined"
           ></component>
+
           <RedoOutlined class="cursor-pointer" />
-          <!-- TODO: 面包屑 -->
+
           <a-breadcrumb>
-            <a-breadcrumb-item
-              v-for="(item) in breadcrumbItems"
-              :key="item"
-            >
-            {{ item }}
+            <a-breadcrumb-item v-for="item in breadcrumbItems" :key="item">
+              {{ item }}
             </a-breadcrumb-item>
           </a-breadcrumb>
         </div>
@@ -318,12 +316,13 @@ const breadcrumbItems = computed(() => {
         </li>
       </TransitionGroup>
 
+      <!-- BUG: 多次点击菜单，会触发多次过渡，会导致页面渲染异常 -->
       <!-- content -->
       <main id="xb-content__wrapper">
-        <RouterView v-slot="{ Component }">
+        <RouterView v-slot="{ Component }" :key="$route.fullPath">
           <Transition
             mode="out-in"
-            :appear="false"
+            :appear="true"
             enter-active-class="animate__animated animate__fadeInRight"
           >
             <KeepAlive>
