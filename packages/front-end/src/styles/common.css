@@ -39,3 +39,8 @@
   background: rgba(0, 0, 0, 0.15);
   transition: color 0.2s ease;
 }
+
+::-webkit-scrollbar-thumb:vertical {
+  background: transparent !important;
+  display: none;
+}

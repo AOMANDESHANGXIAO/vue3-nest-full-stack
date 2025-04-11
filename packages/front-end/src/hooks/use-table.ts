@@ -1,6 +1,6 @@
 import { useAsyncState } from "@vueuse/core";
 import type { ColumnType } from "ant-design-vue/es/table";
-import _ from "lodash";
+import _, { isArray } from "lodash";
 import type { Reactive, Ref } from "vue";
 
 let context: CanvasRenderingContext2D | null = null;
@@ -18,8 +18,6 @@ const getProxyValue = (value: any) => {
   return value;
 };
 
-// TODO: 实现自动计算每一列的width
-// 默认字体为微软雅黑 Microsoft YaHei,字体大小为 14px
 function getTextWidth(text: string, font = "14px Microsoft YaHei") {
   if (!context) {
     return 0;
@@ -28,7 +26,13 @@ function getTextWidth(text: string, font = "14px Microsoft YaHei") {
   const textmetrics = context.measureText(text);
   return textmetrics.width;
 }
-
+/**
+ * 计算表格列宽
+ * @param columns 表格表头
+ * @param data 表格数据
+ * @param options 配置项
+ * @returns 计算后的列宽
+ */
 const calculateColumnWidth = (
   columns: ColumnType[],
   data: any[],
@@ -44,15 +48,52 @@ const calculateColumnWidth = (
   let widthMap = new Map();
   // columns 为动态表格的表头数组 data为展示数据的数组
   //作用是遍历所有数据拿到长度，记下每一列的宽度
+
   data.forEach((target) => {
     for (let key in target) {
-      if (target.hasOwnProperty(key)) {
-        let keyWidth = getTextWidth(target[key]);
-        // 字段有值就放入数组
-        widthMap.has(key)
-          ? widthMap.set(key, widthMap.get(key).concat([keyWidth]))
-          : widthMap.set(key, [keyWidth]);
+      if (!target.hasOwnProperty(key)) {
+        continue;
       }
+      // 查找column中是否设置了customRender
+      const column = columns.find((item) => {
+        if (typeof item.dataIndex === "string") {
+          return item.dataIndex === key;
+        } else if (isArray(item.dataIndex)) {
+          return item.dataIndex[0] === key;
+        }
+      });
+      // 优化：如果column中设置了width，则不计算宽度
+      if (column?.width) {
+        continue;
+      }
+      let text = target[key];
+      // 如果dataIndex为数组，应该要循环dataIndex
+      if (isArray(column?.dataIndex)) {
+        for (let i = 0; i < column.dataIndex.length; i++) {
+          text = target[column.dataIndex[i]];
+        }
+      }
+      if (column?.customRender) {
+        text = column.customRender({
+          text,
+          value: target[key],
+          record: target,
+          index: target.index,
+          renderIndex: target.renderIndex,
+          column,
+        });
+        if (typeof text === "string") {
+          text = text.trim();
+        } else if (typeof text === "object") {
+          // 说明可能使用了渲染函数，则不计算宽度
+          continue;
+        }
+      }
+      let keyWidth = getTextWidth(text);
+      // 字段有值就放入数组
+      widthMap.has(key)
+        ? widthMap.set(key, widthMap.get(key).concat([keyWidth]))
+        : widthMap.set(key, [keyWidth]);
     }
   });
 
@@ -63,7 +104,6 @@ const calculateColumnWidth = (
     let value = valueArr.reduce((acc: number, cur: number) => acc + 1 / cur, 0);
     widthMap.set(mapKey, len / value);
   }
-
   //遍历表头，拿到对应表头的宽度与对应表头下内容比对，取最大值作为列宽，这样可以确保表头不换行。
   return columns.map((item) => {
     // 如果列宽已经设置，则直接返回
@@ -75,12 +115,13 @@ const calculateColumnWidth = (
     }
     // title，dataIndex为 ant design Table对应参数
     let textWidth = getTextWidth(item.title as string);
-    if (widthMap.get(item.dataIndex) < textWidth) {
-      widthMap.set(item.dataIndex, textWidth);
+    let index = isArray(item.dataIndex) ? item.dataIndex[0] : item.dataIndex;
+    if (widthMap.get(index) < textWidth) {
+      widthMap.set(index, textWidth);
     }
     return {
       ...item,
-      width: Math.ceil(widthMap.get(item.dataIndex)) + options.padding,
+      width: Math.ceil(widthMap.get(index)) + options.padding,
     };
   });
 };
@@ -182,8 +223,7 @@ export function useTable(
           padding:
             getProxyValue(options.autoCalculateColumnWidth.padding) ?? 35,
           font:
-            getProxyValue(options.autoCalculateColumnWidth.font) ??
-            "14px ali",
+            getProxyValue(options.autoCalculateColumnWidth.font) ?? "14px ali",
         }
       );
     }

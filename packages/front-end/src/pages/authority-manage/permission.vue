@@ -95,6 +95,7 @@ const columns: ColumnType[] = [
     key: "action",
     align: "center",
     width: 150,
+    fixed: "right",
   },
 ];
 const conditions = ref({
