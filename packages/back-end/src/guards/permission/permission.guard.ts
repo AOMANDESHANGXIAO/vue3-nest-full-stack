@@ -33,17 +33,22 @@ export class PermissionGuard implements CanActivate {
       }
       const user = await this.usersService.findRolesById(request.user.uuid);
       const roles = user.roles;
+      console.log('permission check user.roles=', user.roles);
+     
       const permissions: Permission[] = roles.reduce((total, current) => {
         total.push(...current.permissions);
         return total;
       }, []);
-
+      console.log('permission check permissions=', permissions);
+      console.log('permission check requirePermission=', requirePermission);
       const isPermitted = permissions.some(
         (item) => item.name === requirePermission,
       );
+      console.log('permission check isPermitted=', isPermitted);
       if (!isPermitted) {
         throw new UnauthorizedException('您没有权限访问该接口');
       }
+      return true;
     } catch (e) {
       console.log('permission check error', e);
       return false;

@@ -14,7 +14,7 @@ routerMitter.on(HttpStatus.UNAUTHORIZED.toString(), async (router: Router) => {
 
 routerMitter.on(HttpStatus.FORBIDDEN.toString(), async (router: Router) => {
   console.log("forbidden 已被处理");
-  await router.push("/auth/login");
+  await router.push("/auth/403");
 });
 
 export default routerMitter;
