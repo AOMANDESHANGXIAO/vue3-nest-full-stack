@@ -104,11 +104,10 @@ export class UsersService {
   ): Promise<FindAllUsersApiResult> {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
     queryBuilder
-      .leftJoinAndSelect('user.roles', 'roles', 'roles.status = :status', {
-        status: STATUS.ENABLE,
-      })
+      .leftJoinAndSelect('user.roles', 'roles', 'roles.status = :roleStatus', { roleStatus: STATUS.ENABLE })
       .take(pageSize)
       .skip((current - 1) * pageSize);
+
     if (conditions) {
       if (conditions.username) {
         queryBuilder.andWhere('user.username LIKE :username', {
@@ -120,12 +119,12 @@ export class UsersService {
           nickname: `%${conditions.nickname}%`,
         });
       }
-      if (conditions.status || conditions.status === STATUS.DISABLE) {
+      if (conditions.status !== undefined) {
         queryBuilder.andWhere('user.status = :status', {
           status: conditions.status,
         });
       }
-      if (conditions.roleIds) {
+      if (conditions.roleIds && conditions.roleIds.length > 0) {
         queryBuilder.andWhere('roles.id IN (:...roleIds)', {
           roleIds: conditions.roleIds,
         });

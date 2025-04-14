@@ -105,12 +105,17 @@ const conditions = ref({
   status: undefined,
 });
 const {
+  computedColumns,
   queryOptions,
   tableState,
   isLoading,
   search: handleSearch,
 } = useTable(UserApi.getAllUsers, {
   conditions,
+  autoCalculateColumnWidth: {
+    enabled: true,
+    columns: columns,
+  },
 });
 watch(
   conditions,
@@ -506,7 +511,7 @@ useResizeObserver(
       <!--- 表格区域 --->
       <a-table
         :row-key="(record: any) => record.id"
-        :columns="columns"
+        :columns="computedColumns"
         :data-source="tableState.list"
         v-model:pagination="queryOptions"
         :scroll="{ x: '100%', y: 'max-content' }"

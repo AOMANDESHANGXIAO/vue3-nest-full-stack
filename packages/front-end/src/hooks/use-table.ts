@@ -177,7 +177,7 @@ export function useTable(
     }
   };
   const optionsFilter = () => {
-    if (!options || !options.conditions || !_.isEmpty(options.conditions)) {
+    if (!options || !options.conditions || _.isEmpty(options.conditions)) {
       return {
         pageSize: queryOptions.value.params.pageSize,
         current: queryOptions.value.params.current,
