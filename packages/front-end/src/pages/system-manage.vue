@@ -1,11 +1,11 @@
 <route lang="json">
 {
   "meta": {
-    "title": "权限管理",
-    "icon": "user",
+    "title": "系统管理",
+    "icon": "cog",
     "menuOrder": 3,
     "showInMenu": true,
-    "breadcrumbName": "权限管理"
+    "breadcrumbName": "系统管理"
   }
 }
 </route>

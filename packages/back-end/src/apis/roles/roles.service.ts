@@ -105,12 +105,6 @@ export class RolesService {
   async delete(id: string, req: Request) {
     const role = await this.roleRepository.findOneBy({ id });
     if (!role) throw new Error('Role not found');
-    const user = await this.userRepository.findOneBy({ id: req.user.uuid });
-    await this.roleRepository.save({
-      ...role,
-      status: STATUS.DISABLE,
-      updatedBy: user,
-    });
-    return {};
+    return await this.roleRepository.delete(id);
   }
 }

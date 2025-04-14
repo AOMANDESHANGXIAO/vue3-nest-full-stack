@@ -39,9 +39,7 @@ export class PermissionService {
     if (!permission) {
       throw new Error('权限不存在');
     }
-    permission.status = 0;
-    permission.updateBy = user;
-    return await this.permissionRepository.save(permission);
+    return await this.permissionRepository.delete(id);
   }
 
   async update(id: string, data: UpdatePermissionDto, userId: string) {

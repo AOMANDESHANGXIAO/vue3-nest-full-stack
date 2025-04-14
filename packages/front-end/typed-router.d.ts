@@ -22,13 +22,11 @@ declare module 'vue-router/auto-routes' {
     '/auth': RouteRecordInfo<'/auth', '/auth', Record<never, never>, Record<never, never>>,
     '/auth/login': RouteRecordInfo<'/auth/login', '/auth/login', Record<never, never>, Record<never, never>>,
     '/auth/register': RouteRecordInfo<'/auth/register', '/auth/register', Record<never, never>, Record<never, never>>,
-    '/authority-manage': RouteRecordInfo<'/authority-manage', '/authority-manage', Record<never, never>, Record<never, never>>,
-    '/authority-manage/permission': RouteRecordInfo<'/authority-manage/permission', '/authority-manage/permission', Record<never, never>, Record<never, never>>,
-    '/authority-manage/roles': RouteRecordInfo<'/authority-manage/roles', '/authority-manage/roles', Record<never, never>, Record<never, never>>,
-    '/authority-manage/user-role': RouteRecordInfo<'/authority-manage/user-role', '/authority-manage/user-role', Record<never, never>, Record<never, never>>,
-    '/data-manage': RouteRecordInfo<'/data-manage', '/data-manage', Record<never, never>, Record<never, never>>,
-    '/data-manage/dict': RouteRecordInfo<'/data-manage/dict', '/data-manage/dict', Record<never, never>, Record<never, never>>,
     '/home': RouteRecordInfo<'/home', '/home', Record<never, never>, Record<never, never>>,
-    '/setting': RouteRecordInfo<'/setting', '/setting', Record<never, never>, Record<never, never>>,
+    '/system-manage': RouteRecordInfo<'/system-manage', '/system-manage', Record<never, never>, Record<never, never>>,
+    '/system-manage/dict': RouteRecordInfo<'/system-manage/dict', '/system-manage/dict', Record<never, never>, Record<never, never>>,
+    '/system-manage/permission': RouteRecordInfo<'/system-manage/permission', '/system-manage/permission', Record<never, never>, Record<never, never>>,
+    '/system-manage/roles': RouteRecordInfo<'/system-manage/roles', '/system-manage/roles', Record<never, never>, Record<never, never>>,
+    '/system-manage/user-role': RouteRecordInfo<'/system-manage/user-role', '/system-manage/user-role', Record<never, never>, Record<never, never>>,
   }
 }

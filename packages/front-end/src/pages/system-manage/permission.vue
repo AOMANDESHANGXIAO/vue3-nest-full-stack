@@ -1,10 +1,10 @@
 <route lang="json">
 {
   "meta": {
-    "title": "权限",
+    "title": "权限管理",
     "menuOrder": 3,
     "showInMenu": true,
-    "breadcrumbName": ["权限管理", "权限"]
+    "breadcrumbName": ["系统管理", "权限管理"]
   }
 }
 </route>

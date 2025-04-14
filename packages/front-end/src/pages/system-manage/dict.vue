@@ -1,10 +1,10 @@
 <route lang="json">
 {
   "meta": {
-    "title": "字典",
+    "title": "字典管理",
     "menuOrder": 1,
     "showInMenu": true,
-    "breadcrumbName": ["数据管理", "字典"]
+    "breadcrumbName": ["系统管理", "字典管理"]
   }
 }
 </route>

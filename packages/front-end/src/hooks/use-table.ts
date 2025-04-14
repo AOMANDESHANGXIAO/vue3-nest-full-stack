@@ -89,7 +89,7 @@ const calculateColumnWidth = (
           continue;
         }
       }
-      let keyWidth = getTextWidth(text);
+      let keyWidth = getTextWidth(text, options.font);
       // 字段有值就放入数组
       widthMap.has(key)
         ? widthMap.set(key, widthMap.get(key).concat([keyWidth]))
@@ -125,8 +125,6 @@ const calculateColumnWidth = (
     };
   });
 };
-
-// TODO: 实现根据列的宽度自动换行
 
 /**
  * 基于ant-design-vue的表格组件封装的hooks
