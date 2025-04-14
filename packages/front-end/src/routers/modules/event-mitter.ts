@@ -1,18 +1,20 @@
-import mitt from 'mitt'
-import type { Router } from 'vue-router'
+import { HttpStatus } from "@v3-nest-full-stack/shared-types";
+import mitt from "mitt";
+import type { Router } from "vue-router";
 
 type Events = {
-  noAuth: Router
-  logout: Router
-}
-const routerMitter = mitt<Events>()
+  [key: string]: Router;
+};
+const routerMitter = mitt<Events>();
 
-routerMitter.on('noAuth', (router: Router) => {
-  router.push('/auth/login')
-})
+routerMitter.on(HttpStatus.UNAUTHORIZED.toString(), async (router: Router) => {
+  console.log("unauthorized 已被处理");
+  await router.push("/auth/login");
+});
 
-routerMitter.on('logout', (router: Router) => {
- router.push('/auth/login') 
-})
+routerMitter.on(HttpStatus.FORBIDDEN.toString(), async (router: Router) => {
+  console.log("forbidden 已被处理");
+  await router.push("/auth/login");
+});
 
-export default routerMitter
+export default routerMitter;

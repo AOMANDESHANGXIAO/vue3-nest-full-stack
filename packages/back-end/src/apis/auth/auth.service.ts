@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login-dto';
 import { User } from 'src/entities/user.entity';
 import { Role } from 'src/entities/role.entity';
-import { type LoginApiResult } from '@v3-nest-full-stack/shared-types';
+import { STATUS, type LoginApiResult } from '@v3-nest-full-stack/shared-types';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -31,6 +31,10 @@ export class AuthService {
     // 验证用户是否存在
     if (!user) {
       throw new UnauthorizedException('用户名或密码错误');
+    }
+
+    if (user.status === STATUS.DISABLE) {
+      throw new UnauthorizedException('用户已被禁用');
     }
 
     // 验证密码

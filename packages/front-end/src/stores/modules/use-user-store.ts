@@ -4,15 +4,24 @@ import { useLocalStorage } from '@vueuse/core'
 import { UserApi } from '@/apis/modules/user'
 import { AuthApi } from '@/apis/modules/auth'
 import router from '@/routers'
+import mitt from 'mitt'
+import { HttpStatus } from '@v3-nest-full-stack/shared-types'
 
+export const userStoreMitter = mitt<{
+  [key: string]: any
+}>()
+userStoreMitter.on(HttpStatus.UNAUTHORIZED.toString(), () => {
+  useUserStore().logout()
+})
 export interface UserVO {
   id: string;
-  status: boolean;
+  status: number;
   username: string;
   nickname: string;
   createTime: Date;
   updateTime: Date;
 }
+
 
 export const useUserStore = defineStore('user-store', () => {
   const token = useLocalStorage('access_token', '')

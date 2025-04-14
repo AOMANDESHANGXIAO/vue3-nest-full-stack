@@ -104,12 +104,9 @@ export class UsersService {
   ): Promise<FindAllUsersApiResult> {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
     queryBuilder
-      .leftJoinAndSelect(
-        'user.roles',
-        'roles',
-        'roles.status = :status',
-        { status: STATUS.ENABLE },
-      )
+      .leftJoinAndSelect('user.roles', 'roles', 'roles.status = :status', {
+        status: STATUS.ENABLE,
+      })
       .take(pageSize)
       .skip((current - 1) * pageSize);
     if (conditions) {
@@ -152,7 +149,7 @@ export class UsersService {
 
   async findOneById(id: string): Promise<User> {
     return await this.userRepository.findOne({
-      where: { id, status: STATUS.ENABLE },
+      where: { id },
     });
   }
 

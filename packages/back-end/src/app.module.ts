@@ -15,6 +15,7 @@ import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import configuration from 'src/config/configuration';
 import { LoginGuard } from 'src/guards/login/login.guard';
 import { PermissionGuard } from 'src/guards/permission/permission.guard';
+import { UserStatusGuard } from 'src/guards/user-status/user-status.guard';
 import { ValidationPipe } from './pipes/validation.pipe';
 
 @Module({
@@ -46,6 +47,7 @@ import { ValidationPipe } from './pipes/validation.pipe';
     AppService,
     JwtService,
     { provide: APP_GUARD, useClass: LoginGuard },
+    { provide: APP_GUARD, useClass: UserStatusGuard },
     { provide: APP_GUARD, useClass: PermissionGuard },
     { provide: APP_PIPE, useClass: ValidationPipe },
   ],
