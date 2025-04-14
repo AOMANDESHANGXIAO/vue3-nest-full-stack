@@ -104,7 +104,9 @@ export class UsersService {
   ): Promise<FindAllUsersApiResult> {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
     queryBuilder
-      .leftJoinAndSelect('user.roles', 'roles', 'roles.status = :roleStatus', { roleStatus: STATUS.ENABLE })
+      .leftJoinAndSelect('user.roles', 'roles', 'roles.status = :roleStatus', {
+        roleStatus: STATUS.ENABLE,
+      })
       .take(pageSize)
       .skip((current - 1) * pageSize);
 
@@ -138,11 +140,33 @@ export class UsersService {
   }
 
   async findOne(req: Request): Promise<FindOneUserApiResult> {
-    const user = req.user;
+    const uuid = req.user.uuid;
+    const user = await this.userRepository.findOne({
+      where: {
+        id: uuid,
+        status: STATUS.ENABLE,
+        roles: {
+          status: STATUS.ENABLE,
+          permissions: { status: STATUS.ENABLE },
+        },
+      },
+      relations: ['roles', 'roles.permissions'],
+    });
+    const roles = user.roles.map((role) => {
+      return role.name;
+    });
+    const permissions = user.roles.flatMap((role) => {
+      return role.permissions.map((permission) => {
+        return permission.name;
+      });
+    });
+
     return {
-      user: await this.userRepository.findOne({
-        where: { id: user.uuid, status: STATUS.ENABLE },
-      }),
+      user: {
+        ...user,
+        roles,
+        permissions,
+      },
     };
   }
 

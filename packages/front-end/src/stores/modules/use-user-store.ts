@@ -32,6 +32,7 @@ export const useUserStore = defineStore('user-store', () => {
   const initUser = async () => {
     // 使用token来获取用户的信息
     const res = await UserApi.getUserInfo()
+    console.log('initUser res=', res);
     user.value = res.user
   }
   const isLoading = ref(false)

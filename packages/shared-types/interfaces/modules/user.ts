@@ -33,6 +33,8 @@ export interface FindOneUserApiResult {
     nickname: string;
     createTime: Date;
     updateTime: Date;
+    roles: string[];
+    permissions: string[];
   };
 }
 export interface UserResponse {
