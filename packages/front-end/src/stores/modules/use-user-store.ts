@@ -20,8 +20,9 @@ export interface UserVO {
   nickname: string;
   createTime: Date;
   updateTime: Date;
+  roles: string[];
+  permissions: string[];
 }
-
 
 export const useUserStore = defineStore('user-store', () => {
   const token = useLocalStorage('access_token', '')

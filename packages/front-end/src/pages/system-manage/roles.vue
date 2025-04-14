@@ -18,15 +18,25 @@ import ContentContainer from "@/components/layouts/content-container.vue";
 import { useTable } from "@/hooks/use-table";
 import { useDictStore } from "@/stores/modules/use-dict-store";
 import { commonDateFormatter } from "@/utils/time";
-import { PlusOutlined, UndoOutlined, SearchOutlined } from "@ant-design/icons-vue";
-import { type CreateRoleInterface, type UpdateRoleInterface, type GetRoleListResult, type RoleOperatorRecord, type QueryPermissionResult, STATUS } from "@v3-nest-full-stack/shared-types";
+import {
+  PlusOutlined,
+  UndoOutlined,
+  SearchOutlined,
+} from "@ant-design/icons-vue";
+import {
+  type CreateRoleInterface,
+  type UpdateRoleInterface,
+  type GetRoleListResult,
+  type RoleOperatorRecord,
+  type QueryPermissionResult,
+  STATUS,
+} from "@v3-nest-full-stack/shared-types";
 import { useAsyncState } from "@vueuse/core";
 import { useElementSize } from "@vueuse/core";
 import { type FormInstance, Input, message, Select } from "ant-design-vue";
 import type { Rule } from "ant-design-vue/es/form";
 import type { ColumnType } from "ant-design-vue/es/table";
 import _ from "lodash";
-
 
 const { getDict } = useDictStore();
 
@@ -230,7 +240,7 @@ const fetchPermissionsParmas = {
   pageSize: 10,
   conditions: {
     status: STATUS.ENABLE,
-  }
+  },
 };
 const { execute: fetchPagedPermissions } = useAsyncState(
   PermissionApi.getList,
@@ -372,7 +382,12 @@ const aTableWrapperStyle = computed(() => {
         </a-button>
       </a-form-item>
       <a-form-item class="absolute right-0">
-        <a-button type="primary" class="ml-2" @click="handleCreate">
+        <a-button
+          type="primary"
+          class="ml-2"
+          @click="handleCreate"
+          v-permissions="['role:create']"
+        >
           <PlusOutlined></PlusOutlined>
           <span>新增</span>
         </a-button>
@@ -396,7 +411,7 @@ const aTableWrapperStyle = computed(() => {
         </template>
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
-            <div class="flex items-center">
+            <div class="flex items-center justify-center">
               <a-button
                 type="primary"
                 class="mr-2"
@@ -414,7 +429,12 @@ const aTableWrapperStyle = computed(() => {
                   handleDelete(record as GetRoleListResult['list'][number])
                 "
               >
-                <a-button danger :loading="isDeleteLoading">删除</a-button>
+                <a-button
+                  danger
+                  :loading="isDeleteLoading"
+                  v-permissions="['role:del']"
+                  >删除</a-button
+                >
               </a-popconfirm>
             </div>
           </template>
