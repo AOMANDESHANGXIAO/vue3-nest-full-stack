@@ -24,6 +24,5 @@
     "./*d.ts",
     "./auto-imports.d.ts",
     "./typed-router.d.ts",
-    "./test.d.ts"
   ]
 }

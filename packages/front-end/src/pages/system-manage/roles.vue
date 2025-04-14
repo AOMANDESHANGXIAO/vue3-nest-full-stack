@@ -37,6 +37,7 @@ import { type FormInstance, Input, message, Select } from "ant-design-vue";
 import type { Rule } from "ant-design-vue/es/form";
 import type { ColumnType } from "ant-design-vue/es/table";
 import _ from "lodash";
+import { vPermissions } from "@/directives/v-permissions";
 
 const { getDict } = useDictStore();
 
