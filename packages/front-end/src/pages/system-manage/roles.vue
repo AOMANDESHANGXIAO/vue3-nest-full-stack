@@ -38,11 +38,17 @@ import type { Rule } from "ant-design-vue/es/form";
 import type { ColumnType } from "ant-design-vue/es/table";
 import _ from "lodash";
 import { vPermissions } from "@/directives/v-permissions";
-
+import Tags from "@/components/ui/Tags.vue";
+import { useSystemConfigStore } from "@/stores/modules/use-system-config-store";
+import { rgbToHex } from "@/utils/color";
 const { getDict } = useDictStore();
 
 defineOptions({
   name: "role",
+});
+const systemConfigStore = useSystemConfigStore();
+const tagColor = computed(() => {
+  return rgbToHex(systemConfigStore.config.cssVars["--color-primary"]);
 });
 const columns: ColumnType[] = [
   {
@@ -69,13 +75,6 @@ const columns: ColumnType[] = [
     dataIndex: "permissions",
     key: "permissions",
     align: "center",
-    customRender: ({ text }) =>
-      text
-        .map(
-          (item: GetRoleListResult["list"][number]["permissions"][number]) =>
-            item.name
-        )
-        .join(",") || "--",
   },
   {
     title: "创建时间",
@@ -438,6 +437,17 @@ const aTableWrapperStyle = computed(() => {
                 >
               </a-popconfirm>
             </div>
+          </template>
+          <template v-else-if="column.dataIndex === 'permissions'">
+            <Tags
+              :tags="
+                record.permissions.map(
+                  (item: GetRoleListResult['list'][number]['permissions'][number]) =>
+                    item.name
+                )
+              "
+              :color="tagColor"
+            />
           </template>
         </template>
       </a-table>

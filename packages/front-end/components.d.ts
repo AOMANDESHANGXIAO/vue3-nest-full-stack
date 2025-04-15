@@ -34,6 +34,7 @@ declare module 'vue' {
     ATable: typeof import('ant-design-vue/es')['Table']
     ATabPane: typeof import('ant-design-vue/es')['TabPane']
     ATabs: typeof import('ant-design-vue/es')['Tabs']
+    ATag: typeof import('ant-design-vue/es')['Tag']
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
     Bell: typeof import('./src/components/ui/Bell.vue')['default']
     ContentContainer: typeof import('./src/components/layouts/content-container.vue')['default']
@@ -43,5 +44,6 @@ declare module 'vue' {
     MenuPageContent: typeof import('./src/components/business/menu-page-content.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Tags: typeof import('./src/components/ui/Tags.vue')['default']
   }
 }
