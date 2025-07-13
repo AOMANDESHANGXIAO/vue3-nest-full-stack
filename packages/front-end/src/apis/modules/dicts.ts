@@ -1,7 +1,7 @@
 import service from "@/apis";
 import type {
   DictListResult,
-  GetListCommonParams,
+  QueryParams,
   FindOneDictResult,
   GetAllDictsDetailResult,
 } from "@v3-nest-full-stack/shared-types";
@@ -9,7 +9,7 @@ import type {
 const baseUrl = "/dicts";
 export class DictsApi {
   static async getDictList(
-    params: GetListCommonParams
+    params: QueryParams
   ): Promise<DictListResult> {
     return service({
       method: "get",
